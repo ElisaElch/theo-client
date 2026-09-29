@@ -1,0 +1,24 @@
+:root {
+  /* Brand palette */
+  --color-forest: #12382c;
+  --color-sage: #aeb99a;
+  --color-cream: #faf7f0;
+  --color-white: #fffdf8;
+  --color-ink: #263c35;
+
+  /* Supporting accents */
+  --color-terracotta: #c76542;
+  --color-lavender: #c7caf3;
+  --color-peach: #f2d9c8;
+
+  /* Roles: what each colour is used for */
+  --color-bg: var(--color-cream);
+  --color-surface: var(--color-white);
+  --color-text: var(--color-ink);
+  --color-primary: var(--color-forest);
+
+  /* Fonts */
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-heading: "Cormorant Garamond", Georgia, serif;
+  --font-hand: "Caveat", cursive;
+}
