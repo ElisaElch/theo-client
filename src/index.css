@@ -1,24 +1,60 @@
+@import "tailwindcss";
 @import "./styles/tokens.css";
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@plugin "daisyui" {
+  themes: false;
 }
 
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  line-height: 1.5;
+@plugin "daisyui/theme" {
+  name: "theo";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #faf7f0;
+  --color-base-200: #f3eee4;
+  --color-base-300: #e7e0d2;
+  --color-base-content: #263c35;
+
+  --color-primary: #12382c;
+  --color-primary-content: #fffdf8;
+  --color-secondary: #aeb99a;
+  --color-secondary-content: #12382c;
+  --color-accent: #c76542;
+  --color-accent-content: #fffdf8;
+  --color-neutral: #263c35;
+  --color-neutral-content: #faf7f0;
+
+  --color-info: #c7caf3;
+  --color-info-content: #12382c;
+  --color-success: #aeb99a;
+  --color-success-content: #12382c;
+  --color-warning: #f2d9c8;
+  --color-warning-content: #12382c;
+  --color-error: #c76542;
+  --color-error-content: #fffdf8;
+
+  --radius-selector: 1rem;
+  --radius-field: 2rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  color: var(--color-primary);
-  line-height: 1.1;
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-forest);
+    line-height: 1.1;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
 }
