@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import MyPlacesPage from "./pages/MyPlacesPage";
 import MapPage from "./pages/MapPage";
@@ -13,16 +14,24 @@ import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   return (
     <Routes>
+      {/* Pages with the navbar */}
       <Route element={<Layout />}>
+        {/* Public: anyone can see these */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/my-places" element={<MyPlacesPage />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/friends" element={<FriendsPage />} />
-        <Route path="/places/new" element={<AddPlacePage />} />
-        <Route path="/places/:id" element={<PlacePage />} />
+
+        {/* Private: need a login */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/my-places" element={<MyPlacesPage />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/friends" element={<FriendsPage />} />
+          <Route path="/places/new" element={<AddPlacePage />} />
+          <Route path="/places/:id" element={<PlacePage />} />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
+      {/* Full-screen pages without the navbar */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignUpPage />} />
     </Routes>
