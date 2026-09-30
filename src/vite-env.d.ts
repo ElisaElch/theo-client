@@ -1,9 +1,11 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+// To add your own VITE_ environment variables later, type them here:
+//
+// interface ImportMetaEnv {
+//   readonly VITE_EXAMPLE: string;
+// }
+//
+// interface ImportMeta {
+//   readonly env: ImportMetaEnv;
+// }
