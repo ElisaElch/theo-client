@@ -1,16 +1,43 @@
 import { useState, type ChangeEvent } from "react";
-import { ImagePlus, X } from "lucide-react";
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import { ImagePlus } from "lucide-react";
 import { cloudinaryImage } from "../../utils/cloudinaryImage";
 import type { StepProps } from "./formTypes";
+import SortablePhoto from "./SortablePhoto";
 
 // Same limits as the API
 const MAX_PHOTOS = 12;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
-// Step 3: pick photos and see previews straight away (uploading happens on Save).
-// When editing, already-uploaded photos are shown too and can be removed.
+// Step 3: pick photos, see previews straight away, and drag them into order.
+// The first photo is the cover. Uploading happens on Save.
 function PhotosStep({ form, updateForm }: StepProps) {
   const [error, setError] = useState("");
+
+  // How a drag can start:
+  // - mouse: after moving 5px (so a normal click doesn't start a drag)
+  // - touch: after holding for 200ms (so swiping still scrolls the page)
+  // - keyboard: Space to pick up, arrow keys to move, Space to drop
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   function handleFiles(e: ChangeEvent<HTMLInputElement>) {
     const picked = Array.from(e.target.files ?? []);
@@ -44,33 +71,45 @@ function PhotosStep({ form, updateForm }: StepProps) {
     updateForm({ photos: form.photos.filter((_, i) => i !== index) });
   }
 
+  // A photo was dropped: move it from its old position to the new one
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = form.photos.findIndex((photo) => photo.previewUrl === active.id);
+    const newIndex = form.photos.findIndex((photo) => photo.previewUrl === over.id);
+    updateForm({ photos: arrayMove(form.photos, oldIndex, newIndex) });
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <h2 className="text-3xl">Photos</h2>
-      <p className="text-ink/70">A few photos help you remember the details. Up to 12.</p>
+      <p className="text-ink/70">
+        A few photos help you remember the details. Up to 12. Drag them to change the order: the
+        first one is your cover photo.
+      </p>
 
-      {/* Preview grid */}
+      {/* Sortable preview grid */}
       {form.photos.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {form.photos.map((photo, index) => (
-            <div key={photo.previewUrl} className="relative">
-              <img
-                // Existing photos: ask Cloudinary for a small version
-                src={photo.uploaded ? cloudinaryImage(photo.uploaded.url, 400) : photo.previewUrl}
-                alt={`Photo ${index + 1}`}
-                className="aspect-square w-full rounded-box object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => removePhoto(index)}
-                className="btn btn-circle btn-sm absolute top-2 right-2"
-                aria-label={`Remove photo ${index + 1}`}
-              >
-                <X className="h-4 w-4" />
-              </button>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext
+            items={form.photos.map((photo) => photo.previewUrl)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {form.photos.map((photo, index) => (
+                <SortablePhoto
+                  key={photo.previewUrl}
+                  id={photo.previewUrl}
+                  // Existing photos: ask Cloudinary for a small version
+                  src={photo.uploaded ? cloudinaryImage(photo.uploaded.url, 400) : photo.previewUrl}
+                  alt={`Photo ${index + 1}`}
+                  isCover={index === 0}
+                  onRemove={() => removePhoto(index)}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       {/* Picker: a styled label wrapping a hidden file input */}
