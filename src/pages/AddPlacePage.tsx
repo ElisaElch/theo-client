@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { uploadPhotos } from "../api/uploads";
+import { preparePhotos } from "../api/uploads";
 import { createVisit } from "../api/visits";
 import DetailsStep from "../components/addPlace/DetailsStep";
 import ExperienceStep from "../components/addPlace/ExperienceStep";
@@ -23,13 +23,16 @@ function AddPlacePage() {
     setForm((current) => ({ ...current, ...changes }));
   }
 
-  // --- Free the photo preview URLs when leaving the page ---
+  // --- Free the temporary preview URLs of new photos when leaving the page ---
   const photosRef = useRef(form.photos);
   useEffect(() => {
     photosRef.current = form.photos;
   }, [form.photos]);
   useEffect(() => {
-    return () => photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+    return () =>
+      photosRef.current.forEach((photo) => {
+        if (photo.file) URL.revokeObjectURL(photo.previewUrl);
+      });
   }, []);
 
   // --- What's still missing on the current step? ("" = nothing) ---
@@ -71,10 +74,7 @@ function AddPlacePage() {
     setError("");
 
     try {
-      const photos =
-        form.photos.length > 0
-          ? (await uploadPhotos(form.photos.map((photo) => photo.file))).photos
-          : [];
+      const photos = await preparePhotos(form.photos);
 
       const { visit } = await createVisit({
         place: {

@@ -1,7 +1,8 @@
-import { useState, type KeyboardEvent } from "react";
-import { BedDouble, Coffee, UtensilsCrossed, X } from "lucide-react";
+import { useState } from "react";
+import { BedDouble, Coffee, UtensilsCrossed } from "lucide-react";
 import { reverseGeocode, type LocationResult } from "../../api/locationSearch";
 import type { PlaceType } from "../../types/visit";
+import TagsInput from "../TagsInput";
 import MiniMap from "../map/MiniMap";
 import type { StepProps } from "./formTypes";
 import LocationSearch from "./LocationSearch";
@@ -22,7 +23,6 @@ const TYPE_WORDS: Record<PlaceType, string> = {
 
 // Step 1: type, location, name, date and tags
 function DetailsStep({ form, updateForm }: StepProps) {
-  const [tagInput, setTagInput] = useState("");
   const [pinError, setPinError] = useState("");
 
   const typeWord = form.type ? TYPE_WORDS[form.type] : "place";
@@ -40,7 +40,7 @@ function DetailsStep({ form, updateForm }: StepProps) {
     });
   }
 
-  // The pin was dragged: look up the new city and country, keep the name
+  // The pin was moved: look up the new city and country, keep the name
   async function handlePinMove(lat: number, lng: number) {
     setPinError("");
     try {
@@ -49,26 +49,6 @@ function DetailsStep({ form, updateForm }: StepProps) {
     } catch {
       setPinError("Couldn't look up that spot. Try moving the pin again.");
     }
-  }
-
-  // --- Tags ---
-  function addTag() {
-    const tag = tagInput.trim();
-    if (tag && !form.tags.includes(tag) && form.tags.length < 20) {
-      updateForm({ tags: [...form.tags, tag] });
-    }
-    setTagInput("");
-  }
-
-  function handleTagKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addTag();
-    }
-  }
-
-  function removeTag(tagToRemove: string) {
-    updateForm({ tags: form.tags.filter((tag) => tag !== tagToRemove) });
   }
 
   // Today's date as "YYYY-MM-DD", so visit dates can't be in the future
@@ -117,7 +97,7 @@ function DetailsStep({ form, updateForm }: StepProps) {
         />
       </label>
 
-      {/* Map: drag the pin to the exact spot */}
+      {/* Map: click or drag the pin to the exact spot */}
       {form.location && (
         <div className="flex flex-col gap-2">
           <MiniMap
@@ -148,24 +128,7 @@ function DetailsStep({ form, updateForm }: StepProps) {
       {/* Tags */}
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">Tags (optional)</span>
-        <div className="flex flex-wrap gap-2">
-          {form.tags.map((tag) => (
-            <span key={tag} className="badge gap-1 bg-base-200 py-3">
-              {tag}
-              <button type="button" onClick={() => removeTag(tag)} aria-label={`Remove ${tag}`}>
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-        <input
-          className="input w-full"
-          placeholder="Type a tag and press Enter, e.g. Brunch"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={handleTagKeyDown}
-          onBlur={addTag}
-        />
+        <TagsInput tags={form.tags} onChange={(tags) => updateForm({ tags })} />
       </div>
     </div>
   );

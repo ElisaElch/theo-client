@@ -1,10 +1,12 @@
 import type { LocationResult } from "../../api/locationSearch";
-import type { PlaceType } from "../../types/visit";
+import type { PlaceType, Photo } from "../../types/visit";
 
-// A photo picked on this device but not uploaded yet
+// A photo in the form: either new (a file on this device, not uploaded yet)
+// or existing (already uploaded to Cloudinary, when editing a visit)
 export type PhotoDraft = {
-  file: File;
-  previewUrl: string; // temporary local URL, so the preview shows instantly
+  previewUrl: string; // what the <img> shows
+  file?: File; // only for new photos
+  uploaded?: Photo; // only for existing photos: { url, publicId }
 };
 
 // Everything the Add a Place form collects across its four steps
