@@ -1,12 +1,14 @@
 import { useState, type ChangeEvent } from "react";
 import { ImagePlus, X } from "lucide-react";
+import { cloudinaryImage } from "../../utils/cloudinaryImage";
 import type { StepProps } from "./formTypes";
 
 // Same limits as the API
 const MAX_PHOTOS = 12;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
-// Step 3: pick photos and see previews straight away (uploading happens on Save)
+// Step 3: pick photos and see previews straight away (uploading happens on Save).
+// When editing, already-uploaded photos are shown too and can be removed.
 function PhotosStep({ form, updateForm }: StepProps) {
   const [error, setError] = useState("");
 
@@ -23,7 +25,7 @@ function PhotosStep({ form, updateForm }: StepProps) {
     if (tooBig.length > 0) setError("Some photos were over 10 MB and were skipped.");
     if (okFiles.length > spaceLeft) setError(`You can add up to ${MAX_PHOTOS} photos.`);
 
-    // Create a temporary local URL for each photo, for an instant preview
+    // Create a temporary local URL for each new photo, for an instant preview
     const newPhotos = okFiles.slice(0, spaceLeft).map((file) => ({
       file,
       previewUrl: URL.createObjectURL(file),
@@ -33,7 +35,12 @@ function PhotosStep({ form, updateForm }: StepProps) {
   }
 
   function removePhoto(index: number) {
-    URL.revokeObjectURL(form.photos[index].previewUrl); // free the memory
+    const photo = form.photos[index];
+
+    // Only new photos have a temporary local URL to free.
+    // Existing photos are removed from Cloudinary by the API when saving.
+    if (photo.file) URL.revokeObjectURL(photo.previewUrl);
+
     updateForm({ photos: form.photos.filter((_, i) => i !== index) });
   }
 
@@ -48,7 +55,8 @@ function PhotosStep({ form, updateForm }: StepProps) {
           {form.photos.map((photo, index) => (
             <div key={photo.previewUrl} className="relative">
               <img
-                src={photo.previewUrl}
+                // Existing photos: ask Cloudinary for a small version
+                src={photo.uploaded ? cloudinaryImage(photo.uploaded.url, 400) : photo.previewUrl}
                 alt={`Photo ${index + 1}`}
                 className="aspect-square w-full rounded-box object-cover"
               />

@@ -14,3 +14,16 @@ export function uploadPhotos(files: File[]) {
     body: formData,
   });
 }
+
+// Turns the form's photos into the final list to save on a visit:
+// new photos (files) are uploaded, existing ones are kept, and the order stays the same
+export async function preparePhotos(drafts: { file?: File; uploaded?: Photo }[]): Promise<Photo[]> {
+  const newFiles = drafts.flatMap((draft) => (draft.file ? [draft.file] : []));
+
+  // Upload all new files in one request (skipped if there are none)
+  const justUploaded = newFiles.length > 0 ? (await uploadPhotos(newFiles)).photos : [];
+
+  // Put each photo back in its original position
+  let nextUploaded = 0;
+  return drafts.map((draft) => draft.uploaded ?? justUploaded[nextUploaded++]);
+}

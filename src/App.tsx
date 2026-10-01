@@ -7,6 +7,7 @@ import MapPage from "./pages/MapPage";
 import FriendsPage from "./pages/FriendsPage";
 import AddPlacePage from "./pages/AddPlacePage";
 import PlacePage from "./pages/PlacePage";
+import EditPlacePage from "./pages/EditPlacePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -26,6 +27,7 @@ function App() {
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/places/new" element={<AddPlacePage />} />
           <Route path="/places/:id" element={<PlacePage />} />
+          <Route path="/places/:id/edit" element={<EditPlacePage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
