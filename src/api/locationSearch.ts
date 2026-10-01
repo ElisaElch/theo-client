@@ -82,3 +82,33 @@ function toLocationResult(result: NominatimResult): LocationResult {
     label: result.display_name,
   };
 }
+
+// Looks up the address at a point on the map (used for a dragged pin or
+// the user's current location), so we know the city and country.
+export async function reverseGeocode(lat: number, lng: number): Promise<LocationResult> {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lon: String(lng),
+    format: "jsonv2",
+    addressdetails: "1",
+    zoom: "18", // street level, the most detailed
+  });
+
+  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`);
+
+  if (!res.ok) {
+    throw new Error("Couldn't look up this location. Please try again.");
+  }
+
+  const result: NominatimResult = await res.json();
+  const location = toLocationResult(result);
+
+  return {
+    ...location,
+    // A pin placed by hand is never treated as a known venue, so it gets its
+    // own unique id. That way it can't accidentally merge with another place.
+    externalId: `custom:${crypto.randomUUID()}`,
+    // Keep the exact spot the user chose, not Nominatim's nearest address
+    coordinates: { lat, lng },
+  };
+}
