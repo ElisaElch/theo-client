@@ -1,11 +1,10 @@
 /// <reference types="vite/client" />
 
-// To add your own VITE_ environment variables later, type them here:
-//
-// interface ImportMetaEnv {
-//   readonly VITE_EXAMPLE: string;
-// }
-//
-// interface ImportMeta {
-//   readonly env: ImportMetaEnv;
-// }
+// Our own VITE_ environment variables
+interface ImportMetaEnv {
+  readonly VITE_CARTO_KEY: string; // CARTO map tiles key (public by design)
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
