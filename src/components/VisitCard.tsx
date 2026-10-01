@@ -60,7 +60,7 @@ function VisitCard({ visit }: { visit: Visit }) {
         {visit.memory && <p className="line-clamp-2 text-sm text-ink/80">{visit.memory}</p>}
 
         <div className="mt-1 flex flex-wrap gap-1">
-          <span className="badge badge-secondary badge-sm">{TYPE_LABELS[place.type]}</span>
+          <span className="badge badge-secondary badge-sm">{TYPE_LABELS[visit.type]}</span>
           {visit.tags.slice(0, 2).map((tag) => (
             <span key={tag} className="badge badge-sm bg-base-200">
               {tag}

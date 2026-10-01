@@ -1,10 +1,11 @@
 import { apiFetch } from "./client";
-import type { Photo, Place, Visit } from "../types/visit";
+import type { Photo, Place, Visit, PlaceType } from "../types/visit";
 
 // What the frontend sends when saving a place:
 // the place facts (without _id; the API finds or creates it) + the visit details
 export type CreateVisitData = {
   place: Omit<Place, "_id">;
+  type?: PlaceType; // this person's own category
   status?: "visited" | "wantToGo";
   visitDate?: string; // "2025-03-12"
   rating?: number; // 1–10, or 11 for exceptional

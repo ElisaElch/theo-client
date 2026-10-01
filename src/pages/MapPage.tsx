@@ -43,7 +43,7 @@ function MapPage() {
 
   // Only the visits of the ticked types
   const shownVisits = useMemo(
-    () => (visits ?? []).filter((visit) => shownTypes.includes(visit.place.type)),
+    () => (visits ?? []).filter((visit) => shownTypes.includes(visit.type)),
     [visits, shownTypes],
   );
   const stats = useMemo(() => getVisitStats(visits ?? []), [visits]);

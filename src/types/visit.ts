@@ -21,6 +21,7 @@ export type Visit = {
   _id: string;
   user: string;
   place: Place; // filled in by populate("place") on the API
+  type: PlaceType; // this person's own category (the API falls back to the place's type)
   status: "visited" | "wantToGo";
   visitDate?: string; // dates arrive as text in JSON, e.g. "2025-03-12T00:00:00.000Z"
   rating?: number; // 1–10, or 11 for an exceptional place

@@ -131,7 +131,7 @@ function PlacePage() {
             <MapPin className="h-4 w-4" />
             {[place.city, place.country].filter(Boolean).join(", ")}
           </span>
-          <span className="badge badge-secondary">{TYPE_LABELS[place.type]}</span>
+          <span className="badge badge-secondary">{TYPE_LABELS[visit.type]}</span>
         </div>
 
         {visit.tags.length > 0 && (
