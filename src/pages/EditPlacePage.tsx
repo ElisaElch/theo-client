@@ -6,10 +6,11 @@ import ExperienceStep from "../components/addPlace/ExperienceStep";
 import { emptyForm, type AddPlaceForm } from "../components/addPlace/formTypes";
 import PhotosStep from "../components/addPlace/PhotosStep";
 import TagsInput from "../components/TagsInput";
+import TypePicker from "../components/TypePicker";
 import type { Visit } from "../types/visit";
 
-// Edit your visit: date, tags, rating, favourite, what you had, memory, photos.
-// The place itself (name, location, type) isn't editable, because it's shared with others.
+// Edit your visit: your type, date, tags, rating, favourite, what you had, memory, photos.
+// The place itself (name, location) isn't editable, because it's shared with others.
 function EditPlacePage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function EditPlacePage() {
         setVisit(visit);
         setForm({
           ...emptyForm,
+          type: visit.type, // your own category
           visitDate: visit.visitDate?.slice(0, 10) ?? "", // "2025-03-12T00:00..." → "2025-03-12"
           tags: visit.tags,
           rating: visit.rating ?? 0,
@@ -73,6 +75,7 @@ function EditPlacePage() {
   async function handleSave() {
     if (!id) return;
 
+    if (!form.type) return setError("Please choose a type of place.");
     if (!form.visitDate) return setError("Please add the date you visited.");
     if (form.rating === 0) return setError("Please add a rating.");
     if (form.rating === 11 && !form.exceptionalReason.trim()) {
@@ -86,6 +89,7 @@ function EditPlacePage() {
       const photos = await preparePhotos(form.photos);
 
       await updateVisit(id, {
+        type: form.type,
         visitDate: form.visitDate,
         tags: form.tags,
         rating: form.rating,
@@ -135,9 +139,14 @@ function EditPlacePage() {
         </p>
       </header>
 
-      {/* Date and tags */}
+      {/* Type, date and tags */}
       <section className="card flex flex-col gap-6 bg-soft-white p-6">
         <h2 className="text-3xl">Details</h2>
+
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 text-sm font-medium">What type of place is it for you?</legend>
+          <TypePicker value={form.type} onChange={(type) => updateForm({ type })} />
+        </fieldset>
 
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium">Date visited</span>

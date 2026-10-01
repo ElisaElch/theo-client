@@ -32,8 +32,7 @@ export function filterVisits(visits: Visit[], filters: VisitFilters): Visit[] {
     }
 
     // Type: only the ticked types (none ticked = all)
-    if (filters.types.length > 0 && !filters.types.includes(place.type)) return false;
-
+    if (filters.types.length > 0 && !filters.types.includes(visit.type)) return false;
     // Rating: at least the minimum
     if (filters.minRating > 0 && (visit.rating ?? 0) < filters.minRating) return false;
 

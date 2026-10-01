@@ -1,18 +1,11 @@
 import { useState } from "react";
-import { BedDouble, Coffee, UtensilsCrossed } from "lucide-react";
 import { reverseGeocode, type LocationResult } from "../../api/locationSearch";
 import type { PlaceType } from "../../types/visit";
 import TagsInput from "../TagsInput";
+import TypePicker from "../TypePicker";
 import MiniMap from "../map/MiniMap";
 import type { StepProps } from "./formTypes";
 import LocationSearch from "./LocationSearch";
-
-// The three type buttons, in the order shown
-const PLACE_TYPES: { value: PlaceType; label: string; Icon: typeof Coffee }[] = [
-  { value: "cafe", label: "Café", Icon: Coffee },
-  { value: "restaurant", label: "Restaurant", Icon: UtensilsCrossed },
-  { value: "hotel", label: "Hotel", Icon: BedDouble },
-];
 
 // Words used in labels, e.g. "Name of the café"
 const TYPE_WORDS: Record<PlaceType, string> = {
@@ -60,24 +53,8 @@ function DetailsStep({ form, updateForm }: StepProps) {
 
       {/* Type */}
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-medium">What type of place is it?</legend>
-        <div className="grid grid-cols-3 gap-3">
-          {PLACE_TYPES.map(({ value, label, Icon }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => updateForm({ type: value })}
-              className={`flex flex-col items-center gap-2 rounded-box border-2 p-4 font-medium ${
-                form.type === value
-                  ? "border-forest bg-soft-white"
-                  : "border-transparent bg-base-200 hover:border-base-300"
-              }`}
-            >
-              <Icon className="h-6 w-6 text-forest" />
-              {label}
-            </button>
-          ))}
-        </div>
+        <legend className="mb-2 text-sm font-medium">What type of place is it for you?</legend>
+        <TypePicker value={form.type} onChange={(type) => updateForm({ type })} />
       </fieldset>
 
       {/* Find the place */}

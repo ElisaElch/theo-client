@@ -77,6 +77,8 @@ function AddPlacePage() {
       const photos = await preparePhotos(form.photos);
 
       const { visit } = await createVisit({
+        // The shared place. Its type is only a suggestion,
+        // used if this is the first time anyone saves this place.
         place: {
           externalId: form.location.externalId,
           type: form.type,
@@ -85,6 +87,7 @@ function AddPlacePage() {
           country: form.location.country,
           coordinates: form.location.coordinates,
         },
+        type: form.type, // your own category for this place
         visitDate: form.visitDate,
         rating: form.rating,
         exceptionalReason: form.rating === 11 ? form.exceptionalReason.trim() : "",
