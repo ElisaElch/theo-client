@@ -1,5 +1,6 @@
-import { ImageIcon, MapPin, CalendarDays } from "lucide-react";
+import { CalendarDays, Heart, ImageIcon, MapPin } from "lucide-react";
 import { formatDate } from "../../utils/formatDate";
+import StarRating from "../StarRating";
 import type { AddPlaceForm } from "./formTypes";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
@@ -11,13 +12,22 @@ function PlacePreview({ form }: { form: AddPlaceForm }) {
   return (
     <div className="card overflow-hidden bg-soft-white">
       {/* Cover photo, or a placeholder until one is added */}
-      {coverPhoto ? (
-        <img src={coverPhoto} alt="" className="aspect-[4/3] w-full object-cover" />
-      ) : (
-        <div className="flex aspect-[4/3] w-full items-center justify-center bg-base-200">
-          <ImageIcon className="h-10 w-10 text-ink/30" />
-        </div>
-      )}
+      <div className="relative">
+        {coverPhoto ? (
+          <img src={coverPhoto} alt="" className="aspect-[4/3] w-full object-cover" />
+        ) : (
+          <div className="flex aspect-[4/3] w-full items-center justify-center bg-base-200">
+            <ImageIcon className="h-10 w-10 text-ink/30" />
+          </div>
+        )}
+
+        {/* Favourite heart, top right like the mockup cards */}
+        {form.isFavourite && (
+          <span className="absolute top-3 right-3 rounded-full bg-soft-white p-2">
+            <Heart className="h-4 w-4 fill-terracotta text-terracotta" />
+          </span>
+        )}
+      </div>
 
       <div className="flex flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-2">
@@ -32,11 +42,11 @@ function PlacePreview({ form }: { form: AddPlaceForm }) {
           </p>
         )}
 
-        {form.rating > 0 && (
-          <p className="text-amber-400" aria-label={`${form.rating} out of 5 stars`}>
-            {"★".repeat(form.rating)}
-            <span className="text-base-300">{"★".repeat(5 - form.rating)}</span>
-          </p>
+        {form.rating > 0 && <StarRating rating={form.rating} size="sm" />}
+
+        {/* The reason behind the 11th star */}
+        {form.rating === 11 && form.exceptionalReason && (
+          <p className="text-sm italic text-terracotta">"{form.exceptionalReason}"</p>
         )}
 
         {form.tags.length > 0 && (

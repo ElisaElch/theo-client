@@ -36,11 +36,16 @@ function AddPlacePage() {
   function missingOnStep(stepNumber: number): string {
     if (stepNumber === 1) {
       if (!form.type) return "Please choose a type of place.";
-      if (!form.location) return "Please search for the location and pick a result.";
+      if (!form.location) return "Please find the place, or use your current location.";
       if (!form.name.trim()) return "Please give the place a name.";
       if (!form.visitDate) return "Please add the date you visited.";
     }
-    if (stepNumber === 2 && form.rating === 0) return "Please add a rating.";
+    if (stepNumber === 2) {
+      if (form.rating === 0) return "Please add a rating.";
+      if (form.rating === 11 && !form.exceptionalReason.trim()) {
+        return "Tell us what made it exceptional, or remove the 11th star.";
+      }
+    }
     return "";
   }
 
@@ -82,6 +87,8 @@ function AddPlacePage() {
         },
         visitDate: form.visitDate,
         rating: form.rating,
+        exceptionalReason: form.rating === 11 ? form.exceptionalReason.trim() : "",
+        isFavourite: form.isFavourite,
         whatIHad: form.whatIHad,
         memory: form.memory,
         tags: form.tags,

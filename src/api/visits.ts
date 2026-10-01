@@ -7,7 +7,9 @@ export type CreateVisitData = {
   place: Omit<Place, "_id">;
   status?: "visited" | "wantToGo";
   visitDate?: string; // "2025-03-12"
-  rating?: number;
+  rating?: number; // 1–10, or 11 for exceptional
+  exceptionalReason?: string; // required by the API when rating is 11
+  isFavourite?: boolean;
   whatIHad?: string;
   memory?: string;
   tags?: string[];

@@ -23,7 +23,9 @@ export type Visit = {
   place: Place; // filled in by populate("place") on the API
   status: "visited" | "wantToGo";
   visitDate?: string; // dates arrive as text in JSON, e.g. "2025-03-12T00:00:00.000Z"
-  rating?: number;
+  rating?: number; // 1–10, or 11 for an exceptional place
+  exceptionalReason: string; // why it earned the 11th star ("" otherwise)
+  isFavourite: boolean;
   whatIHad: string;
   memory: string;
   tags: string[];

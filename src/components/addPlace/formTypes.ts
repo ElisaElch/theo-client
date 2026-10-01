@@ -16,7 +16,9 @@ export type AddPlaceForm = {
   visitDate: string; // "2025-03-12", the format <input type="date"> uses
   tags: string[];
   // Step 2: Your experience
-  rating: number; // 0 = not rated yet
+  rating: number; // 0 = not rated yet, 1–10, or 11 = exceptional
+  exceptionalReason: string; // only used when rating is 11
+  isFavourite: boolean;
   whatIHad: string;
   memory: string;
   // Step 3: Photos
@@ -30,6 +32,8 @@ export const emptyForm: AddPlaceForm = {
   visitDate: "",
   tags: [],
   rating: 0,
+  exceptionalReason: "",
+  isFavourite: false,
   whatIHad: "",
   memory: "",
   photos: [],

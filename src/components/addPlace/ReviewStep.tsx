@@ -1,4 +1,6 @@
+import { Heart } from "lucide-react";
 import { formatDate } from "../../utils/formatDate";
+import StarRating from "../StarRating";
 import type { AddPlaceForm } from "./formTypes";
 
 type Props = {
@@ -27,14 +29,29 @@ function ReviewStep({ form, goToStep }: Props) {
       </section>
 
       {/* Experience */}
-      <section className="flex flex-col gap-1">
+      <section className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h3 className="text-xl">Your experience</h3>
           <button type="button" className="link text-sm" onClick={() => goToStep(2)}>
             Edit
           </button>
         </div>
-        <p className="text-amber-400">{"★".repeat(form.rating)}</p>
+
+        <StarRating rating={form.rating} />
+
+        {form.rating === 11 && form.exceptionalReason && (
+          <p className="text-sm italic text-terracotta">
+            Exceptional because: {form.exceptionalReason}
+          </p>
+        )}
+
+        {form.isFavourite && (
+          <p className="flex items-center gap-1 text-sm">
+            <Heart className="h-4 w-4 fill-terracotta text-terracotta" />
+            In your favourites
+          </p>
+        )}
+
         {form.whatIHad && (
           <p>
             <span className="font-medium">What I had:</span> {form.whatIHad}
