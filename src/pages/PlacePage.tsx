@@ -117,7 +117,7 @@ function PlacePage() {
       {/* Heading: name, location, type, favourite, tags */}
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-5xl">{place.name}</h1>
+          <h1 className="text-4xl sm:text-5xl">{place.name}</h1>
           {visit.isFavourite && (
             <Heart
               className="h-6 w-6 fill-terracotta text-terracotta"
