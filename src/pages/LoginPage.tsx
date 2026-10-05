@@ -80,7 +80,7 @@ function LoginPage() {
 
         <p className="mt-6 text-center text-sm">
           Don't have an account?{" "}
-          <Link to="/signup" className="link">
+          <Link to="/signup" state={location.state} className="link">
             Sign up
           </Link>
         </p>

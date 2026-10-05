@@ -18,7 +18,8 @@ function ProtectedRoute() {
 
   // Not logged in: go to login, remembering where they were heading
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    // pathname + search keeps e.g. "/friends?add=sophietest" from an invite link
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
 
   // Logged in: show the page
