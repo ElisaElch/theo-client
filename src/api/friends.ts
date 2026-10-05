@@ -1,5 +1,10 @@
 import { apiFetch } from "./client";
-import type { ConnectionsResponse, SearchResult, FriendProfileResponse } from "../types/friends";
+import type {
+  ConnectionsResponse,
+  SearchResult,
+  FriendProfileResponse,
+  FriendVisitResponse,
+} from "../types/friends";
 
 // GET /api/users/search?username=...
 export function searchUser(username: string) {
@@ -41,4 +46,9 @@ export function removeConnection(connectionId: string) {
 // GET /api/users/:id/visits: a friend's places (404 if not friends)
 export function getFriendVisits(userId: string) {
   return apiFetch<FriendProfileResponse>(`/users/${userId}/visits`);
+}
+
+// GET /api/users/:id/visits/:visitId: one of a friend's places, in full
+export function getFriendVisit(userId: string, visitId: string) {
+  return apiFetch<FriendVisitResponse>(`/users/${userId}/visits/${visitId}`);
 }

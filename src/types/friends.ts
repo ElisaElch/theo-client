@@ -51,3 +51,9 @@ export type FriendProfileResponse = {
   friend: { id: string; name: string; username: string };
   visits: FriendVisit[];
 };
+
+// GET /api/users/:id/visits/:visitId
+export type FriendVisitResponse = {
+  friend: { id: string; name: string; username: string };
+  visit: FriendVisit;
+};

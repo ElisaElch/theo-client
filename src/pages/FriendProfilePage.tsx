@@ -81,11 +81,15 @@ function FriendProfilePage() {
         </div>
       </header>
 
-      {/* Their places, best-rated first (cards aren't clickable yet) */}
+      {/* Their places, best-rated first */}
       {visits.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {visits.map((visit) => (
-            <VisitCard key={visit._id} visit={visit} />
+            <VisitCard
+              key={visit._id}
+              visit={visit}
+              to={`/friends/${friend.id}/places/${visit._id}`}
+            />
           ))}
         </div>
       ) : (

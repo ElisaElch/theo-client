@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import FriendProfilePage from "./pages/FriendProfilePage";
+import FriendVisitPage from "./pages/FriendVisitPage";
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
           <Route path="/places/:id/edit" element={<EditPlacePage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/friends/:userId" element={<FriendProfilePage />} />
+          <Route path="/friends/:userId" element={<FriendProfilePage />} />
+          <Route path="/friends/:userId/places/:visitId" element={<FriendVisitPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
