@@ -1,23 +1,26 @@
 import { Link } from "react-router";
 import { CalendarDays, Heart, ImageIcon, MapPin } from "lucide-react";
-import type { Visit } from "../types/visit";
+import type { FriendVisit } from "../types/friends";
 import { cloudinaryImage } from "../utils/cloudinaryImage";
 import { formatDate } from "../utils/formatDate";
 import StarRating from "./StarRating";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
 
-// One place in a grid: photo, name, location, date, stars, a bit of the memory.
-// The whole card links to the place's page.
-function VisitCard({ visit }: { visit: Visit }) {
+type Props = {
+  // Your own visit (with a date), or a friend's visit (without one)
+  visit: FriendVisit & { visitDate?: string };
+  // Where the card links to. No link = a plain card (e.g. friends' places for now)
+  to?: string;
+};
+
+// One place in a grid: photo, name, location, date (own visits only), stars, a bit of the memory
+function VisitCard({ visit, to }: Props) {
   const { place } = visit;
   const coverPhoto = visit.photos[0];
 
-  return (
-    <Link
-      to={`/places/${visit._id}`}
-      className="card overflow-hidden bg-soft-white transition hover:-translate-y-1 hover:shadow-md"
-    >
+  const content = (
+    <>
       {/* Photo, with the favourite heart in the corner */}
       <div className="relative">
         {coverPhoto ? (
@@ -47,6 +50,7 @@ function VisitCard({ visit }: { visit: Visit }) {
           {[place.city, place.country].filter(Boolean).join(", ")}
         </p>
 
+        {/* Only your own visits have a date (friends never see when) */}
         {visit.visitDate && (
           <p className="flex items-center gap-1 text-sm text-ink/70">
             <CalendarDays className="h-3.5 w-3.5" />
@@ -68,8 +72,22 @@ function VisitCard({ visit }: { visit: Visit }) {
           ))}
         </div>
       </div>
-    </Link>
+    </>
   );
+
+  const cardClass = "card overflow-hidden bg-soft-white";
+
+  // With a link: the whole card is clickable, with a hover lift
+  if (to) {
+    return (
+      <Link to={to} className={`${cardClass} transition hover:-translate-y-1 hover:shadow-md`}>
+        {content}
+      </Link>
+    );
+  }
+
+  // Without a link: a plain card
+  return <div className={cardClass}>{content}</div>;
 }
 
 export default VisitCard;

@@ -1,5 +1,6 @@
 import { BellOff, Bell, UserMinus } from "lucide-react";
 import type { Friend } from "../../types/friends";
+import { Link } from "react-router";
 
 type Props = {
   friends: Friend[];
@@ -26,10 +27,14 @@ function FriendsList({ friends, busyId, onToggleMute, onRemove }: Props) {
           >
             <div>
               <p className="flex items-center gap-2 font-medium">
-                {friend.user.name}
+                <Link
+                  to={`/friends/${friend.user.id}`}
+                  className="hover:text-forest hover:underline"
+                >
+                  {friend.user.name}
+                </Link>
                 {friend.isMuted && <span className="badge badge-sm">Muted</span>}
               </p>
-              <p className="text-sm text-ink/60">@{friend.user.username}</p>
             </div>
 
             <div className="flex gap-1">

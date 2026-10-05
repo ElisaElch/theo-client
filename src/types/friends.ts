@@ -1,3 +1,5 @@
+import type { Visit } from "./visit";
+
 // Matches the API's /api/users/search and /api/connections responses
 
 // GET /api/users/search: searchers only see the username and first name
@@ -35,4 +37,23 @@ export type ConnectionsResponse = {
   friends: Friend[];
   incoming: IncomingRequest[];
   outgoing: OutgoingRequest[];
+};
+
+// A friend's visit: the same as your own visits, minus the private parts.
+// No dates (visitDate, createdAt, updatedAt), as friends never see WHEN you were somewhere.
+export type FriendVisit = Omit<
+  Visit,
+  "user" | "status" | "visitDate" | "sourceUrl" | "createdAt" | "updatedAt"
+>;
+
+// GET /api/users/:id/visits
+export type FriendProfileResponse = {
+  friend: { id: string; name: string; username: string };
+  visits: FriendVisit[];
+};
+
+// GET /api/users/:id/visits/:visitId
+export type FriendVisitResponse = {
+  friend: { id: string; name: string; username: string };
+  visit: FriendVisit;
 };
