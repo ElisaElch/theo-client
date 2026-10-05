@@ -1,23 +1,46 @@
 import { useState, type KeyboardEvent } from "react";
-import { LocateFixed } from "lucide-react";
-import { reverseGeocode, searchLocations, type LocationResult } from "../../api/locationSearch";
+import { LocateFixed, MapPin } from "lucide-react";
+import {
+  reverseGeocode,
+  searchLocations,
+  searchNearby,
+  type LocationResult,
+  type NearbyResult,
+} from "../../api/locationSearch";
+import type { PlaceType } from "../../types/visit";
 
 type Props = {
+  type: PlaceType | ""; // which kind of places to suggest nearby
   onSelect: (result: LocationResult) => void;
 };
 
 // Positions less accurate than this (in metres) get a warning
 const ACCURATE_ENOUGH = 500;
 
-// Search box, "use my current location", and the results list.
+// Labels for the nearby list heading
+const NEARBY_LABELS: Record<PlaceType, string> = {
+  cafe: "cafés",
+  restaurant: "restaurants",
+  hotel: "hotels",
+};
+
+// "40 m" or "1.2 km"
+function formatDistance(metres: number): string {
+  return metres < 1000 ? `${Math.round(metres)} m` : `${(metres / 1000).toFixed(1)} km`;
+}
+
+// Search box, "use my current location" (with nearby suggestions), and the results list.
 // Searches on Enter or the button, never while typing.
-function LocationSearch({ onSelect }: Props) {
+function LocationSearch({ type, onSelect }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<LocationResult[]>([]);
+  const [nearby, setNearby] = useState<NearbyResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(""); // e.g. "only approximate"
+
+  const nearbyType: PlaceType = type || "cafe"; // cafés if no type is chosen yet
 
   async function handleSearch() {
     if (!query.trim()) return;
@@ -25,6 +48,7 @@ function LocationSearch({ onSelect }: Props) {
     setIsBusy(true);
     setError("");
     setNotice("");
+    setNearby([]);
 
     try {
       setResults(await searchLocations(query.trim()));
@@ -44,16 +68,18 @@ function LocationSearch({ onSelect }: Props) {
     }
   }
 
+  // A search result or a nearby place was picked
   function handleSelect(result: LocationResult) {
     onSelect(result);
     setQuery(result.name);
     setResults([]);
+    setNearby([]);
     setHasSearched(false);
     setNotice("");
   }
 
   // Asks the browser for the user's position (it asks for permission first),
-  // then looks up the address there
+  // looks up the address there, then suggests the closest places
   function handleUseCurrentLocation() {
     if (!navigator.geolocation) {
       setError("Your browser can't share your location.");
@@ -63,6 +89,7 @@ function LocationSearch({ onSelect }: Props) {
     setIsBusy(true);
     setError("");
     setNotice("");
+    setResults([]);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -72,7 +99,6 @@ function LocationSearch({ onSelect }: Props) {
         try {
           const result = await reverseGeocode(latitude, longitude);
           onSelect(result);
-          setResults([]);
 
           // Laptops without GPS often only know roughly where they are
           if (accuracy > ACCURATE_ENOUGH) {
@@ -81,6 +107,13 @@ function LocationSearch({ onSelect }: Props) {
             setNotice(
               `This is only your approximate location (within about ${distance}). Click the map or drag the pin to the exact spot.`,
             );
+          }
+
+          // Suggest the closest places. If this fails, the user can still search or use the pin.
+          try {
+            setNearby(await searchNearby(latitude, longitude, nearbyType));
+          } catch {
+            setNearby([]);
           }
         } catch (err) {
           setError(err instanceof Error ? err.message : "Couldn't look up your location.");
@@ -139,7 +172,31 @@ function LocationSearch({ onSelect }: Props) {
         </div>
       )}
 
-      {/* Results list */}
+      {/* Nearby places, after "Use my current location" */}
+      {nearby.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium">
+            Are you at one of these {NEARBY_LABELS[nearbyType]}?
+          </p>
+          <ul className="menu w-full rounded-box border border-base-300 bg-soft-white">
+            {nearby.map((place) => (
+              <li key={place.externalId}>
+                <button type="button" onClick={() => handleSelect(place)}>
+                  <MapPin className="h-4 w-4 shrink-0 text-forest" />
+                  <span className="flex flex-col items-start">
+                    <span className="font-medium">{place.name}</span>
+                    <span className="text-xs text-ink/60">
+                      {formatDistance(place.distance)} away
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Search results */}
       {results.length > 0 && (
         <ul className="menu w-full rounded-box border border-base-300 bg-soft-white">
           {results.map((result) => (
