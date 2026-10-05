@@ -112,3 +112,68 @@ export async function reverseGeocode(lat: number, lng: number): Promise<Location
     coordinates: { lat, lng },
   };
 }
+
+// --- Nearby places (after "Use my current location") ---
+
+export type NearbyResult = LocationResult & {
+  distance: number; // metres from the user's position
+};
+
+// The word Nominatim understands for each type, e.g. "cafe" finds cafés
+const NEARBY_KEYWORD: Record<PlaceType, string> = {
+  cafe: "cafe",
+  restaurant: "restaurant",
+  hotel: "hotel",
+};
+
+// Finds the closest places of one type around a position, nearest first (max 5)
+export async function searchNearby(
+  lat: number,
+  lng: number,
+  type: PlaceType,
+): Promise<NearbyResult[]> {
+  // A box of roughly 400 m in each direction around the user.
+  // Longitude lines get closer together away from the equator, hence the cos().
+  const latDelta = 0.004;
+  const lngDelta = 0.004 / Math.cos((lat * Math.PI) / 180);
+
+  const params = new URLSearchParams({
+    q: NEARBY_KEYWORD[type],
+    format: "jsonv2",
+    addressdetails: "1",
+    limit: "20",
+    viewbox: `${lng - lngDelta},${lat + latDelta},${lng + lngDelta},${lat - latDelta}`,
+    bounded: "1", // only return places inside the box
+  });
+
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`);
+
+  if (!res.ok) {
+    throw new Error("Couldn't find nearby places right now.");
+  }
+
+  const results: NominatimResult[] = await res.json();
+
+  return results
+    .map(toLocationResult)
+    .map((place) => ({
+      ...place,
+      distance: distanceInMetres(lat, lng, place.coordinates.lat, place.coordinates.lng),
+    }))
+    .sort((a, b) => a.distance - b.distance) // nearest first
+    .slice(0, 5);
+}
+
+// Straight-line distance between two points on Earth, in metres (the "haversine" formula)
+function distanceInMetres(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const earthRadius = 6371000; // metres
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+
+  const dLat = toRadians(lat2 - lat1);
+  const dLng = toRadians(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLng / 2) ** 2;
+
+  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}

@@ -60,7 +60,7 @@ function DetailsStep({ form, updateForm }: StepProps) {
       {/* Find the place */}
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">Find the place</span>
-        <LocationSearch onSelect={handleLocationSelect} />
+        <LocationSearch type={form.type} onSelect={handleLocationSelect} />{" "}
       </div>
 
       {/* Name: always visible, filled in automatically for known venues */}
