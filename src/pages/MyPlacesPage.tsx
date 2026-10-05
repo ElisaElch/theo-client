@@ -117,7 +117,7 @@ function MyPlacesPage() {
             </p>
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {shownVisits.map((visit) => (
-                <VisitCard key={visit._id} visit={visit} />
+                <VisitCard key={visit._id} visit={visit} to={`/places/${visit._id}`} />
               ))}
             </div>
           </>
