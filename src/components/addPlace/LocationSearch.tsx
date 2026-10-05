@@ -17,7 +17,7 @@ type Props = {
 // Positions less accurate than this (in metres) get a warning
 const ACCURATE_ENOUGH = 500;
 
-// Labels for the nearby list heading
+// Labels for the nearby list heading and the "none found" message
 const NEARBY_LABELS: Record<PlaceType, string> = {
   cafe: "cafés",
   restaurant: "restaurants",
@@ -36,6 +36,7 @@ function LocationSearch({ type, onSelect }: Props) {
   const [results, setResults] = useState<LocationResult[]>([]);
   const [nearby, setNearby] = useState<NearbyResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [hasSearchedNearby, setHasSearchedNearby] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(""); // e.g. "only approximate"
@@ -49,6 +50,7 @@ function LocationSearch({ type, onSelect }: Props) {
     setError("");
     setNotice("");
     setNearby([]);
+    setHasSearchedNearby(false);
 
     try {
       setResults(await searchLocations(query.trim()));
@@ -75,6 +77,7 @@ function LocationSearch({ type, onSelect }: Props) {
     setResults([]);
     setNearby([]);
     setHasSearched(false);
+    setHasSearchedNearby(false);
     setNotice("");
   }
 
@@ -90,6 +93,7 @@ function LocationSearch({ type, onSelect }: Props) {
     setError("");
     setNotice("");
     setResults([]);
+    setHasSearched(false);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -115,6 +119,7 @@ function LocationSearch({ type, onSelect }: Props) {
           } catch {
             setNearby([]);
           }
+          setHasSearchedNearby(true);
         } catch (err) {
           setError(err instanceof Error ? err.message : "Couldn't look up your location.");
         } finally {
@@ -194,6 +199,13 @@ function LocationSearch({ type, onSelect }: Props) {
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Nothing nearby: say so, instead of showing nothing */}
+      {hasSearchedNearby && nearby.length === 0 && (
+        <p className="text-sm text-ink/70">
+          No {NEARBY_LABELS[nearbyType]} found within 400 m. Search by name or drop the pin instead.
+        </p>
       )}
 
       {/* Search results */}
