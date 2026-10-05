@@ -1,10 +1,14 @@
 import { useState, type SubmitEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../context/useAuth";
 
 function SignUpPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Where to go after signing up: e.g. an invite link's page, or My Places
+  const from = (location.state as { from?: string } | null)?.from ?? "/my-places";
 
   // One state object for all four fields
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
@@ -23,7 +27,7 @@ function SignUpPage() {
 
     try {
       await register(form);
-      navigate("/my-places", { replace: true });
+      navigate(from, { replace: true });
     } catch (err) {
       // Shows the API's message, e.g. "username is already taken"
       setError(err instanceof Error ? err.message : "Something went wrong");
