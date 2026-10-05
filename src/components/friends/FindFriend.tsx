@@ -118,7 +118,7 @@ function FindFriend({ initialUsername = "", onChanged }: Props) {
         <label className="input w-full">
           <Search className="h-4 w-4 text-ink/50" />
           <input
-            placeholder="e.g. elegantswan"
+            placeholder="e.g. theotravels"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             onKeyDown={handleKeyDown}
