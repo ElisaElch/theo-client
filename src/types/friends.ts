@@ -13,10 +13,11 @@ export type SearchResult = {
   } | null;
 };
 
-// A friend: full name, and whether *I* have muted them
+// A friend: full name, how many places they've saved, and whether *I* have muted them
 export type Friend = {
   connectionId: string;
   user: { id: string; name: string; username: string };
+  placeCount: number;
   isMuted: boolean;
 };
 
@@ -54,6 +55,12 @@ export type FriendProfileResponse = {
 
 // GET /api/users/:id/visits/:visitId
 export type FriendVisitResponse = {
+  friend: { id: string; name: string; username: string };
+  visit: FriendVisit;
+};
+
+// GET /api/feed: friends' recent places, newest first (no timestamps)
+export type FeedItem = {
   friend: { id: string; name: string; username: string };
   visit: FriendVisit;
 };

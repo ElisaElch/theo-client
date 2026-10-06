@@ -1,18 +1,23 @@
 import { Routes, Route } from "react-router";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import FriendsLayout from "./components/friends/FriendsLayout";
 import HomePage from "./pages/HomePage";
 import MyPlacesPage from "./pages/MyPlacesPage";
 import MapPage from "./pages/MapPage";
-import FriendsPage from "./pages/FriendsPage";
+import FriendsOverviewPage from "./pages/FriendsOverviewPage";
+import FriendsActivityPage from "./pages/FriendsActivityPage";
+import FindFriendsPage from "./pages/FindFriendsPage";
+import FriendRequestsPage from "./pages/FriendRequestsPage";
+import ManageFriendsPage from "./pages/ManageFriendsPage";
+import FriendProfilePage from "./pages/FriendProfilePage";
+import FriendVisitPage from "./pages/FriendVisitPage";
 import AddPlacePage from "./pages/AddPlacePage";
 import PlacePage from "./pages/PlacePage";
 import EditPlacePage from "./pages/EditPlacePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import FriendProfilePage from "./pages/FriendProfilePage";
-import FriendVisitPage from "./pages/FriendVisitPage";
 
 function App() {
   return (
@@ -26,14 +31,23 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/my-places" element={<MyPlacesPage />} />
           <Route path="/map" element={<MapPage />} />
-          <Route path="/friends" element={<FriendsPage />} />
+
+          {/* Friends section: shared sidebar + data (FriendsLayout) */}
+          <Route path="/friends" element={<FriendsLayout />}>
+            <Route index element={<FriendsOverviewPage />} />
+            <Route path="activity" element={<FriendsActivityPage />} />
+            <Route path="find" element={<FindFriendsPage />} />
+            <Route path="requests" element={<FriendRequestsPage />} />
+            <Route path="manage" element={<ManageFriendsPage />} />
+          </Route>
+
+          {/* A friend's profile and places (full width, no sidebar) */}
+          <Route path="/friends/:userId" element={<FriendProfilePage />} />
+          <Route path="/friends/:userId/places/:visitId" element={<FriendVisitPage />} />
+
           <Route path="/places/new" element={<AddPlacePage />} />
           <Route path="/places/:id" element={<PlacePage />} />
           <Route path="/places/:id/edit" element={<EditPlacePage />} />
-          <Route path="/friends" element={<FriendsPage />} />
-          <Route path="/friends/:userId" element={<FriendProfilePage />} />
-          <Route path="/friends/:userId" element={<FriendProfilePage />} />
-          <Route path="/friends/:userId/places/:visitId" element={<FriendVisitPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
