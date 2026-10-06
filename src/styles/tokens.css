@@ -14,5 +14,6 @@
   /* Fonts */
   --font-sans: "DM Sans", system-ui, sans-serif;
   --font-heading: "Cormorant Garamond", Georgia, serif;
+  --font-display: "DM Serif Display", Georgia, serif;
   --font-hand: "Caveat", cursive;
 }

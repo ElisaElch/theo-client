@@ -33,7 +33,16 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
-  return <AuthContext value={{ user, isLoading, login, register, logout }}>{children}</AuthContext>;
+  // Merges the changed fields into the logged-in user (does nothing if logged out)
+  function updateUser(changes: Partial<User>) {
+    setUser((current) => (current ? { ...current, ...changes } : current));
+  }
+
+  return (
+    <AuthContext value={{ user, isLoading, login, register, logout, updateUser }}>
+      {children}
+    </AuthContext>
+  );
 }
 
 export default AuthProvider;

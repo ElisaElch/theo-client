@@ -9,6 +9,8 @@ export type AuthContextValue = {
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  // Changes some fields of the logged-in user, e.g. { avatarUrl: "https://..." }
+  updateUser: (changes: Partial<User>) => void;
 };
 
 // Starts as null; AuthProvider fills in the real value
