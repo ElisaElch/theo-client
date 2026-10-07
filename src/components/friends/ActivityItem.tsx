@@ -3,6 +3,7 @@ import { ImageIcon, MapPin } from "lucide-react";
 import type { FeedItem } from "../../types/friends";
 import { cloudinaryImage } from "../../utils/cloudinaryImage";
 import StarRating from "../StarRating";
+import Avatar from "../Avatar";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
 
@@ -22,11 +23,7 @@ function ActivityItem({ item }: { item: FeedItem }) {
         to={`/friends/${friend.id}`}
         className="flex w-24 shrink-0 flex-col items-center gap-1 text-center"
       >
-        <span className="avatar avatar-placeholder">
-          <span className="w-12 rounded-full bg-sage text-lg text-forest">
-            {friend.name.charAt(0).toUpperCase()}
-          </span>
-        </span>
+        <Avatar name={friend.name} url={friend.avatarUrl} size="md" />
         <span className="text-sm">
           <span className="font-medium">{firstName}</span> {verb}
         </span>

@@ -5,6 +5,7 @@ import { getFriendVisits } from "../api/friends";
 import VisitCard from "../components/VisitCard";
 import type { FriendProfileResponse } from "../types/friends";
 import { getVisitStats } from "../utils/visitStats";
+import Avatar from "../components/Avatar";
 
 // A friend's places. Only works for accepted friends (the API returns 404 otherwise).
 // No dates anywhere: friends never see WHEN someone was somewhere.
@@ -65,11 +66,7 @@ function FriendProfilePage() {
 
       {/* Who they are, and their stats */}
       <header className="flex flex-wrap items-center gap-5">
-        <span className="avatar avatar-placeholder">
-          <span className="w-20 rounded-full bg-sage text-3xl text-forest">
-            {friend.name.charAt(0).toUpperCase()}
-          </span>
-        </span>
+                <Avatar name={friend.name} url={friend.avatarUrl} size="xl" />
         <div>
           <h1 className="text-4xl sm:text-5xl">{friend.name}</h1>
           <p className="text-ink/60">@{friend.username}</p>

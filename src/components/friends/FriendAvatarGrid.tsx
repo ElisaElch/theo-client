@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import type { Friend } from "../../types/friends";
+import Avatar from "../Avatar";
 
 type Props = {
   friends: Friend[];
@@ -16,12 +17,13 @@ function FriendAvatarGrid({ friends }: Props) {
           to={`/friends/${friend.user.id}`}
           className="group flex flex-col items-center gap-1 text-center"
         >
-          {/* Letter avatar until profile photos exist */}
-          <span className="avatar avatar-placeholder">
-            <span className="w-16 rounded-full bg-sage text-2xl text-forest transition group-hover:ring-2 group-hover:ring-forest">
-              {friend.user.name.charAt(0).toUpperCase()}
-            </span>
-          </span>
+          {/* Photo Avatar */}
+                  <Avatar
+            name={friend.user.name}
+            url={friend.user.avatarUrl}
+            size="lg"
+            className="transition group-hover:ring-2 group-hover:ring-forest"
+          />
           <span className="font-medium group-hover:text-forest">
             {friend.user.name.split(" ")[0]}
           </span>

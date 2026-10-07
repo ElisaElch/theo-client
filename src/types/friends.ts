@@ -1,5 +1,13 @@
 import type { Visit } from "./visit";
 
+// A person you're allowed to see in full: friends, and people who sent you a request
+export type FriendUser = {
+  id: string;
+  name: string;
+  username: string;
+  avatarUrl: string | null; // null = no profile photo
+};
+
 // Matches the API's /api/users/search and /api/connections responses
 
 // GET /api/users/search: searchers only see the username and first name
@@ -16,7 +24,7 @@ export type SearchResult = {
 // A friend: full name, how many places they've saved, and whether *I* have muted them
 export type Friend = {
   connectionId: string;
-  user: { id: string; name: string; username: string };
+  user: FriendUser;
   placeCount: number;
   isMuted: boolean;
 };
@@ -24,7 +32,7 @@ export type Friend = {
 // A request sent to me: full name, so I can be sure who it is
 export type IncomingRequest = {
   connectionId: string;
-  user: { id: string; name: string; username: string };
+  user: FriendUser;
 };
 
 // A request I sent: first name only, as in search
@@ -49,18 +57,18 @@ export type FriendVisit = Omit<
 
 // GET /api/users/:id/visits
 export type FriendProfileResponse = {
-  friend: { id: string; name: string; username: string };
+  friend: FriendUser;
   visits: FriendVisit[];
 };
 
 // GET /api/users/:id/visits/:visitId
 export type FriendVisitResponse = {
-  friend: { id: string; name: string; username: string };
+  friend: FriendUser;
   visit: FriendVisit;
 };
 
 // GET /api/feed: friends' recent places, newest first (no timestamps)
 export type FeedItem = {
-  friend: { id: string; name: string; username: string };
+  friend: FriendUser;
   visit: FriendVisit;
 };

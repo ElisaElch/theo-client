@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router";
 import { Menu, Plus } from "lucide-react";
 import { useAuth } from "../context/useAuth";
+import Avatar from "./Avatar";
 
 // Underline for the page you're currently on (desktop links)
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -88,12 +89,8 @@ function Navbar() {
             {/* User menu */}
             <div className="dropdown dropdown-end">
               <button type="button" tabIndex={0} className="btn btn-ghost gap-2">
-                <span className="avatar avatar-placeholder">
-                  <span className="w-8 rounded-full bg-sage text-forest">
-                    {user.name.charAt(0).toUpperCase()}
-                  </span>
-                </span>
-                <span className="hidden sm:inline">{user.name}</span>
+                       <Avatar name={user.firstName} url={user.avatarUrl} size="sm" />
+                <span className="hidden sm:inline">{user.firstName}</span>
               </button>
 
               <ul
