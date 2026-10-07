@@ -17,7 +17,7 @@ const FEATURES = [
   {
     icon: Heart,
     title: "Build your travel story",
-    text: "Save your favourite places and memories in one beautiful space.",
+    text: "Save your favourite places and memories in one space.",
   },
 ];
 

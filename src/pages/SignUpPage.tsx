@@ -103,7 +103,7 @@ function SignUpPage() {
 
         <div className="mx-auto mt-10 max-w-xl">
           <h1 className="font-heading text-5xl font-semibold text-forest">Create your account</h1>
-          <p className="mt-2 text-ink/80">Join theo and start exploring a more meaningful way.</p>
+          <p className="mt-2 text-ink/80">Join theo and make every place part of your story.</p>
           <p className="mt-1 text-xs text-ink/60">
             <span className="text-terracotta">*</span> required
           </p>
