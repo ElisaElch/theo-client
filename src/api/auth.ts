@@ -5,10 +5,14 @@ import type { User } from "../types/user";
 type AuthResponse = { user: User };
 
 export type RegisterData = {
-  name: string;
+  firstName: string;
+  lastName?: string; // optional
   username: string;
   email: string;
   password: string;
+  location?: string; // optional
+  bio?: string; // optional
+  termsAccepted: boolean; // the API only accepts true
 };
 
 export type LoginData = {
