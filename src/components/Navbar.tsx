@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router";
 import { Menu, Plus } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 import Avatar from "./Avatar";
+import logo from "../assets/theo-logo.svg";
 
 // Underline for the page you're currently on (desktop links)
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -60,8 +61,8 @@ function Navbar() {
           </div>
         )}
 
-        <Link to="/" className="font-heading text-3xl font-bold text-forest">
-          theo
+            <Link to="/" className="shrink-0">
+          <img src={logo} alt="theo home" className="h-10 w-auto" />
         </Link>
       </div>
 
