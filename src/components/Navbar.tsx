@@ -62,8 +62,7 @@ function Navbar() {
         )}
 
             <Link to="/" className="shrink-0">
-          <img src={logo} alt="theo home" className="h-10 w-auto" />
-        </Link>
+          <img src={logo} alt="theo home" className="h-10 w-auto md:h-12 lg:h-14" />        </Link>
       </div>
 
       {/* Middle: main pages (larger screens only, when logged in) */}
