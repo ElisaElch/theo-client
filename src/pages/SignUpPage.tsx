@@ -267,8 +267,15 @@ function SignUpPage() {
                 onChange={(e) => setTermsAccepted(e.target.checked)}
                 required
               />
-              <span>
-                I agree to the Terms of Service and Privacy Policy
+                          <span>
+                I agree to the{" "}
+                <Link to="/terms" target="_blank" rel="noreferrer" className="link">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link to="/privacy" target="_blank" rel="noreferrer" className="link">
+                  Privacy Policy
+                </Link>
                 <RequiredMark />
               </span>
             </label>
