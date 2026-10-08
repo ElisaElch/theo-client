@@ -5,7 +5,8 @@ import { Bookmark, Compass, Send, Users } from "lucide-react";
 // The three cards that go somewhere
 const LINKS = [
   {
-    to: "/map",
+    
+    to: "/map?show=friends",
     icon: Compass,
     title: "Explore places",
     text: "Find new spots recommended by friends.",

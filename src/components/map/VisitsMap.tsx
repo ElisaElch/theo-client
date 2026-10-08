@@ -36,16 +36,31 @@ function FitToPoints({ points }: { points: LatLng[] }) {
   return null;
 }
 
-// The round bubble shown when several pins are grouped: forest green with a cream number.
+// The round bubble shown when several pins are grouped. Its colour shows what's inside:
+// forest = only your places, terracotta = only friends' places, sage = a mix of both.
 // It gets a little bigger as the number grows.
-function createClusterIcon(cluster: { getChildCount: () => number }) {
+function createClusterIcon(cluster: {
+  getChildCount: () => number;
+  getAllChildMarkers: () => L.Marker[];
+}) {
   const count = cluster.getChildCount();
   const size = count < 10 ? 40 : count < 100 ? 48 : 56;
+
+  // How many of the grouped pins are friends' pins?
+  const markers = cluster.getAllChildMarkers();
+  const friendCount = markers.filter((marker) => marker.options.icon === friendPin).length;
+
+  const colours =
+    friendCount === 0
+      ? "bg-forest text-cream" // all yours
+      : friendCount === markers.length
+        ? "bg-terracotta text-soft-white" // all friends'
+        : "bg-sage text-forest"; // a mix
 
   return L.divIcon({
     className: "", // removes Leaflet's default white box, like theoPin
     html: `
-      <div class="flex items-center justify-center rounded-full border-2 border-soft-white bg-forest font-medium text-cream shadow-md"
+      <div class="flex items-center justify-center rounded-full border-2 border-soft-white font-medium shadow-md ${colours}"
            style="width: ${size}px; height: ${size}px;">
         ${count}
       </div>
