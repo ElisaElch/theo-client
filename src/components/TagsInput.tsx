@@ -1,5 +1,5 @@
 import { useState, type KeyboardEvent } from "react";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 type Props = {
   tags: string[];
@@ -8,22 +8,47 @@ type Props = {
 
 const MAX_TAGS = 20; // same limit as the API
 
-// Tag chips with an × to remove, and a box to add new ones (Enter or click away)
+// Tag chips with an × to remove, and a box to add new ones.
+// A tag is added with Enter, a comma, the Add button, or by clicking away.
 function TagsInput({ tags, onChange }: Props) {
   const [input, setInput] = useState("");
 
-  function addTag() {
-    const tag = input.trim();
-    if (tag && !tags.includes(tag) && tags.length < MAX_TAGS) {
-      onChange([...tags, tag]);
+  // Adds several tags at once, skipping empty ones, duplicates and anything over the limit
+  function addTags(values: string[]) {
+    const next = [...tags];
+    for (const value of values) {
+      const tag = value.trim();
+      if (tag && !next.includes(tag) && next.length < MAX_TAGS) {
+        next.push(tag);
+      }
     }
+    // Only update if something was actually added
+    if (next.length !== tags.length) onChange(next);
+  }
+
+  // Turns whatever is in the box into tags, then empties it
+  function commitInput() {
+    addTags(input.split(","));
     setInput("");
+  }
+
+  // While typing: everything before a comma becomes a tag straight away.
+  // Also handles pasting "brunch, coffee, tea" in one go.
+  function handleChange(value: string) {
+    if (!value.includes(",")) {
+      setInput(value);
+      return;
+    }
+    const parts = value.split(",");
+    const stillTyping = parts.pop() ?? ""; // the bit after the last comma
+    addTags(parts);
+    setInput(stillTyping.trimStart());
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
-      e.preventDefault();
-      addTag();
+      e.preventDefault(); // don't submit the whole form
+      commitInput();
     }
   }
 
@@ -45,14 +70,27 @@ function TagsInput({ tags, onChange }: Props) {
           ))}
         </div>
       )}
-      <input
-        className="input w-full"
-        placeholder="Type a tag and press Enter, e.g. Brunch"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={addTag}
-      />
+
+      {/* daisyUI "join": the input and the Add button share one rounded outline */}
+      <div className="join w-full">
+        <input
+          className="input join-item w-full"
+          placeholder="Type a tag, then press Enter or add a comma"
+          value={input}
+          onChange={(e) => handleChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={commitInput}
+        />
+        <button
+          type="button"
+          className="btn join-item"
+          onClick={commitInput}
+          disabled={!input.trim()}
+        >
+          <Plus className="h-4 w-4" />
+          Add
+        </button>
+      </div>
     </div>
   );
 }
