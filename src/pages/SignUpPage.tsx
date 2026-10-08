@@ -26,7 +26,7 @@ function SignUpPage() {
   const location = useLocation();
 
   // Where to go afterwards: the page they tried to open (e.g. an invite link), or My Places
-  const from = (location.state as { from?: string } | null)?.from ?? "/my-places";
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
 
   // All text fields in one object; their keys match the inputs' name attributes
   const [form, setForm] = useState({
