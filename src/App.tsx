@@ -18,14 +18,18 @@ import EditPlacePage from "./pages/EditPlacePage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 function App() {
   return (
     <Routes>
       {/* Pages with the navbar */}
       <Route element={<Layout />}>
-        {/* Public: anyone can see these */}
+               {/* Public: anyone can see these */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* Private: need a login */}
         <Route element={<ProtectedRoute />}>
