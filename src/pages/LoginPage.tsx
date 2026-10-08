@@ -9,8 +9,8 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Where to go after logging in: the page they tried to open, or My Places
-  const from = (location.state as { from?: string } | null)?.from ?? "/my-places";
+  // Where to go after logging in: the page they tried to open, or the Home Dashboard
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
 
   // Form fields and status
   const [email, setEmail] = useState("");
