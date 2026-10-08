@@ -72,3 +72,9 @@ export type FeedItem = {
   friend: FriendUser;
   visit: FriendVisit;
 };
+
+// GET /api/feed/groups: one friend's places from one day (no dates are sent)
+export type ActivityGroup = {
+  friend: FriendUser;
+  visits: FriendVisit[]; // newest first; one or more
+};
