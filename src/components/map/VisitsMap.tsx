@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { Link } from "react-router";
 import L from "leaflet";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import { MAP_TILES } from "../../config";
 import type { Visit } from "../../types/visit";
 import { cloudinaryImage } from "../../utils/cloudinaryImage";
@@ -25,7 +27,27 @@ function FitToVisits({ visits }: { visits: Visit[] }) {
   return null;
 }
 
-// Big map with a pin for every visit. Clicking a pin opens a small card.
+// The round bubble shown when several pins are grouped: forest green with a cream number.
+// It gets a little bigger as the number grows.
+function createClusterIcon(cluster: { getChildCount: () => number }) {
+  const count = cluster.getChildCount();
+  const size = count < 10 ? 40 : count < 100 ? 48 : 56;
+
+  return L.divIcon({
+    className: "", // removes Leaflet's default white box, like theoPin
+    html: `
+      <div class="flex items-center justify-center rounded-full border-2 border-soft-white bg-forest font-medium text-cream shadow-md"
+           style="width: ${size}px; height: ${size}px;">
+        ${count}
+      </div>
+    `,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2], // the centre sits on the group's position
+  });
+}
+
+// Big map with a pin for every visit. Pins close together are grouped into a numbered bubble;
+// clicking a bubble zooms in. Clicking a pin opens a small card.
 function VisitsMap({ visits }: { visits: Visit[] }) {
   return (
     // relative z-0 keeps Leaflet's layers below the navbar dropdown
@@ -33,34 +55,40 @@ function VisitsMap({ visits }: { visits: Visit[] }) {
       <MapContainer center={[20, 0]} zoom={2} className="h-[70vh] w-full">
         <TileLayer url={MAP_TILES.url} attribution={MAP_TILES.attribution} />
 
-        {visits.map((visit) => (
-          <Marker
-            key={visit._id}
-            position={[visit.place.coordinates.lat, visit.place.coordinates.lng]}
-            icon={theoPin}
-          >
-            {/* The small card shown when a pin is clicked */}
-            <Popup>
-              <div className="flex w-48 flex-col gap-1">
-                {visit.photos[0] && (
-                  <img
-                    src={cloudinaryImage(visit.photos[0].url, 300)}
-                    alt=""
-                    className="mb-1 aspect-[4/3] w-full rounded-lg object-cover"
-                  />
-                )}
-                <strong className="text-base text-forest">{visit.place.name}</strong>
-                <span className="text-xs text-ink/70">
-                  {[visit.place.city, visit.place.country].filter(Boolean).join(", ")}
-                </span>
-                {visit.rating && <StarRating rating={visit.rating} size="sm" />}
-                <Link to={`/places/${visit._id}`} className="mt-1 font-medium text-forest">
-                  View place →
-                </Link>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <MarkerClusterGroup
+          iconCreateFunction={createClusterIcon}
+          showCoverageOnHover={false} // no blue outline of the group's area on hover
+          chunkedLoading // adds lots of pins in small batches, so the page stays responsive
+        >
+          {visits.map((visit) => (
+            <Marker
+              key={visit._id}
+              position={[visit.place.coordinates.lat, visit.place.coordinates.lng]}
+              icon={theoPin}
+            >
+              {/* The small card shown when a pin is clicked */}
+              <Popup>
+                <div className="flex w-48 flex-col gap-1">
+                  {visit.photos[0] && (
+                    <img
+                      src={cloudinaryImage(visit.photos[0].url, 300)}
+                      alt=""
+                      className="mb-1 aspect-[4/3] w-full rounded-lg object-cover"
+                    />
+                  )}
+                  <strong className="text-base text-forest">{visit.place.name}</strong>
+                  <span className="text-xs text-ink/70">
+                    {[visit.place.city, visit.place.country].filter(Boolean).join(", ")}
+                  </span>
+                  {visit.rating && <StarRating rating={visit.rating} size="sm" />}
+                  <Link to={`/places/${visit._id}`} className="mt-1 font-medium text-forest">
+                    View place →
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MarkerClusterGroup>
 
         <FitToVisits visits={visits} />
       </MapContainer>
