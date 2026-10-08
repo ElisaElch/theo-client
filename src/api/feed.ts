@@ -10,3 +10,7 @@ export function getFeed() {
 export function getActivityGroups() {
   return apiFetch<{ groups: ActivityGroup[] }>("/feed/groups");
 }
+// GET /api/feed/map: all of your (non-muted) friends' places, for the Map page
+export function getFriendsMapPlaces() {
+  return apiFetch<{ places: FeedItem[] }>("/feed/map");
+}
