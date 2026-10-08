@@ -104,7 +104,7 @@ function MapPage() {
 
       {/* Right: the map */}
       <div className="flex flex-col gap-3">
-        <VisitsMap visits={shownVisits} />
+             <VisitsMap myVisits={shownVisits} />
 
         {visits.length === 0 && (
           <p className="text-center text-ink/70">
