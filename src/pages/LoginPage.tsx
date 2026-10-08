@@ -1,6 +1,8 @@
 import { useState, type SubmitEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/useAuth";
+import { Eye, EyeOff } from "lucide-react";
+import logo from "../assets/theo-logo.svg";
 
 function LoginPage() {
   const { login } = useAuth();
@@ -13,6 +15,7 @@ function LoginPage() {
   // Form fields and status
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // true = password shown as text
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,8 +38,8 @@ function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="card w-full max-w-md bg-soft-white p-8">
-        <Link to="/" className="font-heading text-3xl font-bold text-forest">
-          theo
+            <Link to="/" className="inline-block">
+          <img src={logo} alt="theo home" className="h-14 w-auto" />
         </Link>
 
         <h1 className="mt-6">Welcome back</h1>
@@ -55,17 +58,30 @@ function LoginPage() {
             />
           </label>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Password</span>
-            <input
-              type="password"
-              className="input w-full"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
-          </label>
+                <div className="flex flex-col gap-1">
+            <label htmlFor="login-password" className="text-sm font-medium">
+              Password
+            </label>
+            {/* daisyUI: the .input wrapper holds the real input plus the eye button */}
+            <div className="input w-full">
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="text-ink/60 hover:text-forest"
+              >
+                {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+              </button>
+            </div>
+          </div>
 
           {error && (
             <div role="alert" className="alert alert-error">
