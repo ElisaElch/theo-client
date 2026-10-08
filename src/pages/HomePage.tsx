@@ -2,6 +2,7 @@ import { Navigate } from "react-router";
 import { useAuth } from "../context/useAuth";
 import HomeHero from "../components/home/HomeHero";
 import HomeFeatures from "../components/home/HomeFeatures";
+import HomeClosing from "../components/home/HomeClosing";
 
 // The landing page for visitors.
 // Logged-in users go straight to My Places until their own home page exists.
@@ -18,6 +19,7 @@ function HomePage() {
     <div className="flex flex-col gap-24">
       <HomeHero />
        <HomeFeatures />
+       <HomeClosing />
     </div>
   );
 }

@@ -24,11 +24,7 @@ function HomeHero() {
           </Link>
         </div>
 
-        {/* Handwritten note: under the buttons on phones and large screens,
-            beside them on medium screens, where there's empty space to the right */}
-        <p className="mt-4 max-w-40 -rotate-6 font-hand text-3xl leading-tight text-forest sm:absolute sm:right-8 sm:bottom-0 sm:mt-0 lg:static lg:mt-4">
-          Collect moments, not things <span aria-hidden="true">♡</span>
-        </p>
+    
       </div>
 
       {/* Right: the photo, with a big soft curve on the top-left corner like the mockup */}
