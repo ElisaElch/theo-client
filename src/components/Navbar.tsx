@@ -104,6 +104,11 @@ function Navbar() {
                     Add a place
                   </Link>
                 </li>
+                                <li>
+                  <Link to="/profile/edit" onClick={closeMenu}>
+                    Edit profile
+                  </Link>
+                </li>
                 <li>
                   <button type="button" onClick={handleLogout}>
                     Log out

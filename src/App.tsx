@@ -20,6 +20,7 @@ import SignUpPage from "./pages/SignUpPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/my-places" element={<MyPlacesPage />} />
           <Route path="/map" element={<MapPage />} />
+           <Route path="/profile/edit" element={<EditProfilePage />} />
 
           {/* Friends section: shared sidebar + data (FriendsLayout) */}
           <Route path="/friends" element={<FriendsLayout />}>
