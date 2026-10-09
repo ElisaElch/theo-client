@@ -8,6 +8,7 @@ import PhotosStep from "../components/addPlace/PhotosStep";
 import TagsInput from "../components/TagsInput";
 import TypePicker from "../components/TypePicker";
 import type { Visit } from "../types/visit";
+import { todayLocal } from "../utils/today";
 
 // Edit your visit: your type, date, tags, rating, favourite, what you had, memory, photos.
 // The place itself (name, location) isn't editable, because it's shared with others.
@@ -77,6 +78,7 @@ function EditPlacePage() {
 
     if (!form.type) return setError("Please choose a type of place.");
     if (!form.visitDate) return setError("Please add the date you visited.");
+        if (form.visitDate > todayLocal()) return setError("The visit date can't be in the future.");
     if (form.rating === 0) return setError("Please add a rating.");
     if (form.rating === 11 && !form.exceptionalReason.trim()) {
       return setError("Tell us what made it exceptional, or remove the 11th star.");
@@ -128,7 +130,7 @@ function EditPlacePage() {
     );
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayLocal(); // in the user's own time zone
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { reverseGeocode, type LocationResult } from "../../api/locationSearch";
 import type { PlaceType } from "../../types/visit";
+import { todayLocal } from "../../utils/today";
 import TagsInput from "../TagsInput";
 import TypePicker from "../TypePicker";
 import MiniMap from "../map/MiniMap";
@@ -17,8 +18,12 @@ const TYPE_WORDS: Record<PlaceType, string> = {
 // Step 1: type, location, name, date and tags
 function DetailsStep({ form, updateForm }: StepProps) {
   const [pinError, setPinError] = useState("");
+  const [dateError, setDateError] = useState("");
 
   const typeWord = form.type ? TYPE_WORDS[form.type] : "place";
+
+  // Today in the user's own time zone, so visit dates can't be in the future
+  const today = todayLocal();
 
   // A search result, or the user's current location, was chosen
   function handleLocationSelect(result: LocationResult) {
@@ -44,8 +49,17 @@ function DetailsStep({ form, updateForm }: StepProps) {
     }
   }
 
-  // Today's date as "YYYY-MM-DD", so visit dates can't be in the future
-  const today = new Date().toISOString().split("T")[0];
+  // Some phones (iPhone Safari) ignore the input's max, so check the date here too.
+  // A future date is simply not accepted, and the previous date stays.
+  // ("YYYY-MM-DD" text sorts in date order, so > works for comparing.)
+  function handleDateChange(value: string) {
+    if (value && value > today) {
+      setDateError("The visit date can't be in the future.");
+      return;
+    }
+    setDateError("");
+    updateForm({ visitDate: value });
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -98,8 +112,13 @@ function DetailsStep({ form, updateForm }: StepProps) {
           className="input w-full"
           value={form.visitDate}
           max={today}
-          onChange={(e) => updateForm({ visitDate: e.target.value })}
+          onChange={(e) => handleDateChange(e.target.value)}
         />
+        {dateError && (
+          <span role="alert" className="text-sm text-error">
+            {dateError}
+          </span>
+        )}
       </label>
 
       {/* Tags */}

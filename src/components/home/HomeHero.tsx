@@ -11,8 +11,9 @@ function HomeHero() {
           Good places stay with you.
         </h1>
         <p className="max-w-md text-lg text-ink">
-          Theo helps you remember, share and discover the cafés, restaurants and hotels worth
-          coming back to.
+            Meet Theo.
+            <br />
+        A little home for all the places you've been and loved. Keep your memories, share your favourite places with friends and find inspiration for wherever you're heading next.
         </p>
 
         <div className="flex flex-wrap gap-3">
