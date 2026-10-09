@@ -1,16 +1,19 @@
 import { useEffect, useId, useMemo, useState, type ChangeEvent } from "react";
 import { Camera } from "lucide-react";
+import { cloudinaryImage } from "../../utils/cloudinaryImage";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB, the same limit as the API
 
 type AvatarPickerProps = {
-  file: File | null; // the chosen photo, or null
+  file: File | null; // a newly chosen photo, or null
   onChange: (file: File | null) => void;
+  currentUrl?: string | null; // the photo you already have (Edit profile only)
+  onRemoveCurrent?: () => void; // Remove clicked on that existing photo (Edit profile only)
 };
 
 // Round photo preview with "Choose photo" and "Remove" buttons.
 // Nothing is uploaded here; the parent decides when to upload.
-function AvatarPicker({ file, onChange }: AvatarPickerProps) {
+function AvatarPicker({ file, onChange, currentUrl, onRemoveCurrent }: AvatarPickerProps) {
   const inputId = useId();
   const [error, setError] = useState("");
 
@@ -38,12 +41,22 @@ function AvatarPicker({ file, onChange }: AvatarPickerProps) {
     onChange(chosen);
   }
 
+  // Remove: undo a newly chosen file, or (on Edit profile) remove the existing photo
+  function handleRemove() {
+    if (file) onChange(null);
+    else onRemoveCurrent?.();
+  }
+
+  // What to show in the circle: the new file first, then the existing photo
+  const shownUrl = previewUrl ?? (currentUrl ? cloudinaryImage(currentUrl, 160) : null);
+  const hasPhoto = Boolean(file || currentUrl);
+
   return (
     <div className="flex items-center gap-4">
-      {/* The round preview: the chosen photo, or a camera icon */}
+      {/* The round preview: a photo, or a camera icon */}
       <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sage">
-        {previewUrl ? (
-          <img src={previewUrl} alt="Your chosen profile photo" className="size-full object-cover" />
+        {shownUrl ? (
+          <img src={shownUrl} alt="Your profile photo" className="size-full object-cover" />
         ) : (
           <Camera className="size-6 text-forest" aria-hidden="true" />
         )}
@@ -53,10 +66,10 @@ function AvatarPicker({ file, onChange }: AvatarPickerProps) {
         <div className="flex gap-2">
           {/* The label works as the button; the real file input is hidden */}
           <label htmlFor={inputId} className="btn btn-outline btn-sm">
-            {file ? "Change photo" : "Choose photo"}
+            {hasPhoto ? "Change photo" : "Choose photo"}
           </label>
-          {file && (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(null)}>
+          {hasPhoto && (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={handleRemove}>
               Remove
             </button>
           )}
