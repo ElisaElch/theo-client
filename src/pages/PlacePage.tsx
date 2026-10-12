@@ -8,6 +8,7 @@ import MiniMap from "../components/map/MiniMap";
 import PhotoGallery from "../components/place/PhotoGallery";
 import type { Visit } from "../types/visit";
 import { formatDate } from "../utils/formatDate";
+import FriendsWhoVisited from "../components/place/FriendsWhoVisited";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
 
@@ -143,6 +144,7 @@ function PlacePage() {
             ))}
           </div>
         )}
+                <FriendsWhoVisited visitId={visit._id} />
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">
