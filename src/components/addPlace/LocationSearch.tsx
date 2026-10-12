@@ -7,6 +7,7 @@ import {
   type LocationResult,
   type NearbyResult,
 } from "../../api/locationSearch";
+import { searchTheoPlaces } from "../../api/places";
 import type { PlaceType } from "../../types/visit";
 
 type Props = {
@@ -29,11 +30,12 @@ function formatDistance(metres: number): string {
   return metres < 1000 ? `${Math.round(metres)} m` : `${(metres / 1000).toFixed(1)} km`;
 }
 
-// Search box, "use my current location" (with nearby suggestions), and the results list.
+// Search box, "use my current location" (with nearby suggestions), and the results lists.
 // Searches on Enter or the button, never while typing.
 function LocationSearch({ type, onSelect }: Props) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<LocationResult[]>([]);
+  const [theoResults, setTheoResults] = useState<LocationResult[]>([]); // already on Theo
+  const [results, setResults] = useState<LocationResult[]>([]); // from OpenStreetMap
   const [nearby, setNearby] = useState<NearbyResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [hasSearchedNearby, setHasSearchedNearby] = useState(false);
@@ -43,8 +45,10 @@ function LocationSearch({ type, onSelect }: Props) {
 
   const nearbyType: PlaceType = type || "cafe"; // cafés if no type is chosen yet
 
+  // Searches Theo and OpenStreetMap at the same time
   async function handleSearch() {
-    if (!query.trim()) return;
+    const trimmed = query.trim();
+    if (!trimmed) return;
 
     setIsBusy(true);
     setError("");
@@ -53,10 +57,27 @@ function LocationSearch({ type, onSelect }: Props) {
     setHasSearchedNearby(false);
 
     try {
-      setResults(await searchLocations(query.trim()));
-      setHasSearched(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Search failed");
+      // allSettled waits for both and never throws, so if one search fails
+      // (e.g. the API is still waking up) the other one's results still show
+      const [theoOutcome, osmOutcome] = await Promise.allSettled([
+        searchTheoPlaces(trimmed),
+        searchLocations(trimmed),
+      ]);
+
+      const theoPlaces = theoOutcome.status === "fulfilled" ? theoOutcome.value : [];
+      setTheoResults(theoPlaces);
+
+      if (osmOutcome.status === "fulfilled") {
+        // A place that's already on Theo shows only once, in the "On Theo" list
+        const theoIds = new Set(theoPlaces.map((place) => place.externalId));
+        setResults(osmOutcome.value.filter((result) => !theoIds.has(result.externalId)));
+        setHasSearched(true);
+      } else {
+        setResults([]);
+        setError(
+          osmOutcome.reason instanceof Error ? osmOutcome.reason.message : "Search failed",
+        );
+      }
     } finally {
       setIsBusy(false);
     }
@@ -70,10 +91,11 @@ function LocationSearch({ type, onSelect }: Props) {
     }
   }
 
-  // A search result or a nearby place was picked
+  // A Theo place, a search result or a nearby place was picked
   function handleSelect(result: LocationResult) {
     onSelect(result);
     setQuery(result.name);
+    setTheoResults([]);
     setResults([]);
     setNearby([]);
     setHasSearched(false);
@@ -92,6 +114,7 @@ function LocationSearch({ type, onSelect }: Props) {
     setIsBusy(true);
     setError("");
     setNotice("");
+    setTheoResults([]);
     setResults([]);
     setHasSearched(false);
 
@@ -208,23 +231,47 @@ function LocationSearch({ type, onSelect }: Props) {
         </p>
       )}
 
-      {/* Search results */}
-      {results.length > 0 && (
-        <ul className="menu w-full rounded-box border border-base-300 bg-soft-white">
-          {results.map((result) => (
-            <li key={result.externalId}>
-              <button type="button" onClick={() => handleSelect(result)}>
-                <span className="flex flex-col items-start">
-                  <span className="font-medium">{result.name}</span>
-                  <span className="text-xs text-ink/60">{result.label}</span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      {/* Places already saved on Theo (by anyone), shown first */}
+      {theoResults.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium">On Theo</p>
+          <ul className="menu w-full rounded-box border border-base-300 bg-soft-white">
+            {theoResults.map((place) => (
+              <li key={place.externalId}>
+                <button type="button" onClick={() => handleSelect(place)}>
+                  <MapPin className="h-4 w-4 shrink-0 text-forest" />
+                  <span className="flex flex-col items-start">
+                    <span className="font-medium">{place.name}</span>
+                    <span className="text-xs text-ink/60">{place.label}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
-      {hasSearched && results.length === 0 && (
+      {/* OpenStreetMap results */}
+      {results.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {/* Only needs a heading when there's an "On Theo" list above it */}
+          {theoResults.length > 0 && <p className="text-sm font-medium">More places</p>}
+          <ul className="menu w-full rounded-box border border-base-300 bg-soft-white">
+            {results.map((result) => (
+              <li key={result.externalId}>
+                <button type="button" onClick={() => handleSelect(result)}>
+                  <span className="flex flex-col items-start">
+                    <span className="font-medium">{result.name}</span>
+                    <span className="text-xs text-ink/60">{result.label}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {hasSearched && theoResults.length === 0 && results.length === 0 && (
         <p className="text-sm text-ink/70">
           No results. Try adding the city, or search for the street address instead.
         </p>
