@@ -1,5 +1,6 @@
 import { apiFetch } from "./client";
 import type { Photo, Place, Visit, PlaceType } from "../types/visit";
+import type { FriendWhoVisited } from "../types/friends";
 
 // What the frontend sends when saving a place:
 // the place facts (without _id; the API finds or creates it) + the visit details
@@ -49,4 +50,9 @@ export function updateVisit(id: string, data: UpdateVisitData) {
 // DELETE /api/visits/:id (204, no body)
 export function deleteVisit(id: string) {
   return apiFetch<null>(`/visits/${id}`, { method: "DELETE" });
+}
+
+// GET /api/visits/:id/friends: friends who have also visited this place
+export function getFriendsWhoVisited(id: string) {
+  return apiFetch<{ friends: FriendWhoVisited[] }>(`/visits/${id}/friends`);
 }

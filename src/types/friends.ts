@@ -78,3 +78,10 @@ export type ActivityGroup = {
   friend: FriendUser;
   visits: FriendVisit[]; // newest first; one or more
 };
+
+// One friend who has also visited a place (Place page). No dates, no rating:
+// just who they are, and their visit id for the link to their visit
+export type FriendWhoVisited = {
+  friend: FriendUser;
+  visitId: string;
+};
