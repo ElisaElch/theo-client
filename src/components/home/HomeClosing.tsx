@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
-import mascot from "../../assets/theo-mascot1.png";
+import mascot from "../../assets/theo-mascot1.webp";
 
 // Forest-green band at the bottom of the landing page: mascot, note, closing line and button
 function HomeClosing() {

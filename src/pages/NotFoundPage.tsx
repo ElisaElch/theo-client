@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import sadTheo from "../assets/theo-mascot-sad.png";
+import sadTheo from "../assets/theo-mascot-sad.webp";
 
 // Shown for any address that doesn't exist (the "*" route in App.tsx)
 function NotFoundPage() {
