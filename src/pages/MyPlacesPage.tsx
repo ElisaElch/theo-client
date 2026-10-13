@@ -4,9 +4,13 @@ import { Search } from "lucide-react";
 import { getMyVisits } from "../api/visits";
 import MyPlacesFilters from "../components/myPlaces/MyPlacesFilters";
 import VisitCard from "../components/VisitCard";
-import type { Visit } from "../types/visit";
+import type { SavedFrom, Visit } from "../types/visit";
 import { defaultFilters, filterVisits, type VisitFilters } from "../utils/filterVisits";
 import { getVisitStats } from "../utils/visitStats";
+
+// The "Recommended by" choice: "" = all, "me" = added by me, otherwise a friend's id
+const ALL = "";
+const ADDED_BY_ME = "me";
 
 // "Where have I been?" and "Where do I want to go?": your saved places in two tabs.
 // The tab is in the URL (?tab=want-to-go) so other pages can link straight to it.
@@ -15,6 +19,7 @@ function MyPlacesPage() {
   const [visits, setVisits] = useState<Visit[] | null>(null); // null = still loading
   const [error, setError] = useState("");
   const [filters, setFilters] = useState<VisitFilters>(defaultFilters);
+  const [recommendedBy, setRecommendedBy] = useState(ALL);
 
   const isWantToGoTab = searchParams.get("tab") === "want-to-go";
 
@@ -39,10 +44,16 @@ function MyPlacesPage() {
     setFilters((current) => ({ ...current, ...changes }));
   }
 
+  // Back to everything (search, filters and "Recommended by")
+  function clearAll() {
+    setFilters(defaultFilters);
+    setRecommendedBy(ALL);
+  }
+
   // Switch tabs by changing the URL; filters start fresh on each tab
   function showTab(wantToGo: boolean) {
     setSearchParams(wantToGo ? { tab: "want-to-go" } : {});
-    setFilters(defaultFilters);
+    clearAll();
   }
 
   // Split your places into the two lists
@@ -55,16 +66,26 @@ function MyPlacesPage() {
     [visits],
   );
 
+  // Friends you've saved Want to go places from (each once, by first name)
+  const recommenders = useMemo(() => {
+    const byId = new Map<string, SavedFrom>();
+    wantToGo.forEach(({ savedFrom }) => {
+      if (savedFrom) byId.set(savedFrom._id, savedFrom);
+    });
+    return [...byId.values()].sort((a, b) => a.firstName.localeCompare(b.firstName));
+  }, [wantToGo]);
+
   const currentList = isWantToGoTab ? wantToGo : beenHere;
 
-  // Want to go only uses the search box: date and rating don't apply there
-  const shownVisits = useMemo(
-    () =>
-      isWantToGoTab
-        ? filterVisits(wantToGo, { ...defaultFilters, search: filters.search })
-        : filterVisits(beenHere, filters),
-    [isWantToGoTab, wantToGo, beenHere, filters],
-  );
+  const shownVisits = useMemo(() => {
+    if (!isWantToGoTab) return filterVisits(beenHere, filters);
+
+    // Want to go: only the search box and "Recommended by" (date and rating don't apply)
+    const searched = filterVisits(wantToGo, { ...defaultFilters, search: filters.search });
+    if (recommendedBy === ALL) return searched;
+    if (recommendedBy === ADDED_BY_ME) return searched.filter((visit) => !visit.savedFrom);
+    return searched.filter((visit) => visit.savedFrom?._id === recommendedBy);
+  }, [isWantToGoTab, wantToGo, beenHere, filters, recommendedBy]);
 
   // Stats only count places you've actually been to
   const stats = useMemo(() => getVisitStats(beenHere), [beenHere]);
@@ -98,11 +119,7 @@ function MyPlacesPage() {
   }
 
   const filters_panel = (
-    <MyPlacesFilters
-      filters={filters}
-      onChange={updateFilters}
-      onClear={() => setFilters(defaultFilters)}
-    />
+    <MyPlacesFilters filters={filters} onChange={updateFilters} onClear={clearAll} />
   );
 
   return (
@@ -164,16 +181,35 @@ function MyPlacesPage() {
           </div>
         ) : (
           <>
-            {/* Search */}
-            <label className="input w-full">
-              <Search className="h-4 w-4 text-ink/50" />
-              <input
-                type="search"
-                placeholder="Search by name, city or tag"
-                value={filters.search}
-                onChange={(e) => updateFilters({ search: e.target.value })}
-              />
-            </label>
+            {/* Search, plus "Recommended by" on the Want to go tab */}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <label className="input w-full">
+                <Search className="h-4 w-4 text-ink/50" />
+                <input
+                  type="search"
+                  placeholder="Search by name, city or tag"
+                  value={filters.search}
+                  onChange={(e) => updateFilters({ search: e.target.value })}
+                />
+              </label>
+
+              {isWantToGoTab && recommenders.length > 0 && (
+                <select
+                  className="select w-full sm:w-56"
+                  value={recommendedBy}
+                  onChange={(e) => setRecommendedBy(e.target.value)}
+                  aria-label="Recommended by"
+                >
+                  <option value={ALL}>All recommendations</option>
+                  {recommenders.map((friend) => (
+                    <option key={friend._id} value={friend._id}>
+                      From {friend.firstName}
+                    </option>
+                  ))}
+                  <option value={ADDED_BY_ME}>Added by me</option>
+                </select>
+              )}
+            </div>
 
             {/* Filters: collapsible on phones and tablets (Been here only) */}
             {!isWantToGoTab && (
@@ -198,11 +234,7 @@ function MyPlacesPage() {
             ) : (
               <div className="flex flex-col items-center gap-3 py-12 text-center">
                 <p className="text-ink/70">No places match your search or filters.</p>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setFilters(defaultFilters)}
-                >
+                <button type="button" className="btn btn-ghost btn-sm" onClick={clearAll}>
                   Clear filters
                 </button>
               </div>
