@@ -7,6 +7,7 @@ import MiniMap from "../components/map/MiniMap";
 import PhotoGallery from "../components/place/PhotoGallery";
 import type { FriendVisitResponse } from "../types/friends";
 import Avatar from "../components/Avatar";
+import WantToGoButton from "../components/place/WantToGoButton";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
 
@@ -72,7 +73,7 @@ function FriendVisitPage() {
 
       <PhotoGallery photos={visit.photos} placeName={place.name} />
 
-      {/* Heading: name, location, their type, their favourite, their tags */}
+           {/* Heading: name, location, their type, their favourite, their tags */}
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-4xl sm:text-5xl">{place.name}</h1>
@@ -101,6 +102,8 @@ function FriendVisitPage() {
             ))}
           </div>
         )}
+
+        <WantToGoButton friendId={friend.id} visitId={visit._id} myVisit={data.myVisit} />
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">

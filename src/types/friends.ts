@@ -65,6 +65,7 @@ export type FriendProfileResponse = {
 export type FriendVisitResponse = {
   friend: FriendUser;
   visit: FriendVisit;
+  myVisit: MyVisitSummary | null; // null = I don't have this place yet
 };
 
 // GET /api/feed: friends' recent places, newest first (no timestamps)
@@ -84,4 +85,10 @@ export type ActivityGroup = {
 export type FriendWhoVisited = {
   friend: FriendUser;
   visitId: string;
+};
+
+// Whether I have this place myself, and how (sent with a friend's visit)
+export type MyVisitSummary = {
+  id: string;
+  status: "visited" | "wantToGo";
 };
