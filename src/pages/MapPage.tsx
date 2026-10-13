@@ -46,7 +46,8 @@ function MapPage() {
 
     getMyVisits()
       .then(({ visits }) => {
-        if (!ignore) setVisits(visits);
+                // Only places you've been to: Want to go places aren't "yours" on the map (yet)
+        if (!ignore) setVisits(visits.filter((visit) => visit.status !== "wantToGo"));
       })
       .catch((err) => {
         if (!ignore) setError(err instanceof Error ? err.message : "Couldn't load your places");
