@@ -74,9 +74,7 @@ function LocationSearch({ type, onSelect }: Props) {
         setHasSearched(true);
       } else {
         setResults([]);
-        setError(
-          osmOutcome.reason instanceof Error ? osmOutcome.reason.message : "Search failed",
-        );
+        setError(osmOutcome.reason instanceof Error ? osmOutcome.reason.message : "Search failed");
       }
     } finally {
       setIsBusy(false);

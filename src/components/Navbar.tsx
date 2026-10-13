@@ -61,8 +61,9 @@ function Navbar() {
           </div>
         )}
 
-            <Link to="/" className="shrink-0">
-          <img src={logo} alt="theo home" className="h-10 w-auto md:h-12 lg:h-14" />        </Link>
+        <Link to="/" className="shrink-0">
+          <img src={logo} alt="theo home" className="h-10 w-auto md:h-12 lg:h-14" />{" "}
+        </Link>
       </div>
 
       {/* Middle: main pages (larger screens only, when logged in) */}
@@ -89,7 +90,7 @@ function Navbar() {
             {/* User menu */}
             <div className="dropdown dropdown-end">
               <button type="button" tabIndex={0} className="btn btn-ghost gap-2">
-                       <Avatar name={user.firstName} url={user.avatarUrl} size="sm" />
+                <Avatar name={user.firstName} url={user.avatarUrl} size="sm" />
                 <span className="hidden sm:inline">{user.firstName}</span>
               </button>
 
@@ -104,7 +105,7 @@ function Navbar() {
                     Add a place
                   </Link>
                 </li>
-                                <li>
+                <li>
                   <Link to="/profile/edit" onClick={closeMenu}>
                     Edit profile
                   </Link>

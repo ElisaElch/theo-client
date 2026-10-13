@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Bookmark, Compass, Send, Users } from "lucide-react";
 
-// The three cards that go somewhere
+// The four shortcut cards
 const LINKS = [
   {
-    
     to: "/map?show=friends",
     icon: Compass,
     title: "Explore places",
@@ -23,6 +21,12 @@ const LINKS = [
     title: "Friends' activity",
     text: "Discover where your friends have been.",
   },
+  {
+    to: "/my-places?tab=want-to-go",
+    icon: Send,
+    title: "Plan your next trip",
+    text: "Your Want to go list, for wherever you're heading next.",
+  },
 ];
 
 // Shared look for all four cards
@@ -38,18 +42,8 @@ function IconBadge({ icon: Icon }: { icon: typeof Compass }) {
   );
 }
 
-// Four shortcut cards under the greeting.
-// "Plan your next trip" isn't built yet: it shows a short "Coming soon" message instead.
+// Four shortcut cards under the greeting
 function QuickActions() {
-  const [showComingSoon, setShowComingSoon] = useState(false);
-
-  // Hide the "Coming soon" message again after 2.5 seconds
-  useEffect(() => {
-    if (!showComingSoon) return;
-    const timer = setTimeout(() => setShowComingSoon(false), 2500);
-    return () => clearTimeout(timer); // clean up if the page is left early
-  }, [showComingSoon]);
-
   return (
     <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {LINKS.map(({ to, icon, title, text }) => (
@@ -59,20 +53,6 @@ function QuickActions() {
           <span className="text-sm text-ink/70">{text}</span>
         </Link>
       ))}
-
-      {/* Not a link yet: later this opens the Want to Go list */}
-      <button type="button" className={CARD} onClick={() => setShowComingSoon(true)}>
-        <IconBadge icon={Send} />
-        <span className="font-medium text-ink">Plan your next trip</span>
-        <span className="text-sm text-ink/70">Start a list for your upcoming adventure.</span>
-      </button>
-
-      {/* daisyUI toast: a small message near the bottom of the screen */}
-      {showComingSoon && (
-        <div className="toast toast-center z-20" role="status">
-          <div className="alert bg-forest text-cream">Coming soon: plan trips with a Want to Go list.</div>
-        </div>
-      )}
     </section>
   );
 }

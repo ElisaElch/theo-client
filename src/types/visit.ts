@@ -7,6 +7,19 @@ export type Photo = {
   publicId: string;
 };
 
+// A link about a place, e.g. an Instagram reel or Google Maps (http/https only)
+export type Link = {
+  url: string;
+};
+
+// The friend a Want to go place was saved from ("From Lena")
+export type SavedFrom = {
+  _id: string;
+  firstName: string;
+  username: string;
+  avatar?: { url?: string };
+};
+
 export type Place = {
   _id: string;
   externalId: string;
@@ -32,6 +45,9 @@ export type Visit = {
   tags: string[];
   photos: (Photo & { _id: string })[];
   sourceUrl?: string;
+  wantToGoNote: string; // why you want to go ("" if none); kept after you've been
+  links: Link[]; // empty list if none
+  savedFrom?: SavedFrom; // only on places saved from a friend's place
   createdAt: string;
   updatedAt: string;
 };

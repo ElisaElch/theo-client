@@ -22,8 +22,8 @@ function HomePage() {
       <div className="flex flex-col gap-12">
         <Greeting />
         <QuickActions />
-           <RecentlySaved />
-             <FriendsRecentActivity />
+        <RecentlySaved />
+        <FriendsRecentActivity />
       </div>
     );
   }

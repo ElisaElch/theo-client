@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { preparePhotos } from "../api/uploads";
-import { createVisit } from "../api/visits";
+import { createVisit, type CreateVisitData } from "../api/visits";
 import DetailsStep from "../components/addPlace/DetailsStep";
 import ExperienceStep from "../components/addPlace/ExperienceStep";
 import { emptyForm, type AddPlaceForm } from "../components/addPlace/formTypes";
@@ -11,12 +11,17 @@ import ReviewStep from "../components/addPlace/ReviewStep";
 
 const STEPS = ["Details", "Your experience", "Photos", "Review"];
 
+// Links must be web addresses (the API checks this too)
+const LINK_PATTERN = /^https?:\/\//i;
+
 function AddPlacePage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<AddPlaceForm>(emptyForm);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const isWantToGo = form.status === "wantToGo";
 
   // Steps send only what changed; merge it into the form
   function updateForm(changes: Partial<AddPlaceForm>) {
@@ -41,7 +46,15 @@ function AddPlacePage() {
       if (!form.type) return "Please choose a type of place.";
       if (!form.location) return "Please find the place, or use your current location.";
       if (!form.name.trim()) return "Please give the place a name.";
-      if (!form.visitDate) return "Please add the date you visited.";
+
+      if (isWantToGo) {
+        const link = form.link.trim();
+        if (link && !LINK_PATTERN.test(link)) {
+          return "Links must start with https:// or http://";
+        }
+      } else if (!form.visitDate) {
+        return "Please add the date you visited.";
+      }
     }
     if (stepNumber === 2) {
       if (form.rating === 0) return "Please add a rating.";
@@ -66,43 +79,76 @@ function AddPlacePage() {
     goToStep(step + 1);
   }
 
-  // --- Save: upload photos first, then create the visit ---
-  async function handleSave() {
-    if (!form.location || !form.type) return;
+  // The shared place. Its type is only a suggestion,
+  // used if this is the first time anyone saves this place.
+  function placeFromForm(): CreateVisitData["place"] | null {
+    if (!form.location || !form.type) return null;
+    return {
+      externalId: form.location.externalId,
+      type: form.type,
+      name: form.name.trim(),
+      city: form.location.city,
+      country: form.location.country,
+      coordinates: form.location.coordinates,
+    };
+  }
 
+  // Shared by both ways of saving: create the visit, then open its page
+  async function save(buildData: () => Promise<CreateVisitData>) {
     setIsSaving(true);
     setError("");
 
     try {
-      const photos = await preparePhotos(form.photos);
-
-      const { visit } = await createVisit({
-        // The shared place. Its type is only a suggestion,
-        // used if this is the first time anyone saves this place.
-        place: {
-          externalId: form.location.externalId,
-          type: form.type,
-          name: form.name.trim(),
-          city: form.location.city,
-          country: form.location.country,
-          coordinates: form.location.coordinates,
-        },
-        type: form.type, // your own category for this place
-        visitDate: form.visitDate,
-        rating: form.rating,
-        exceptionalReason: form.rating === 11 ? form.exceptionalReason.trim() : "",
-        isFavourite: form.isFavourite,
-        whatIHad: form.whatIHad,
-        memory: form.memory,
-        tags: form.tags,
-        photos,
-      });
-
+      const { visit } = await createVisit(await buildData());
       navigate(`/places/${visit._id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setIsSaving(false);
     }
+  }
+
+  // --- Save a place you've been to: upload photos first, then create the visit ---
+  function handleSave() {
+    const place = placeFromForm();
+    if (!place || !form.type) return;
+    const type = form.type;
+
+    save(async () => ({
+      place,
+      type, // your own category for this place
+      status: "visited",
+      visitDate: form.visitDate,
+      rating: form.rating,
+      exceptionalReason: form.rating === 11 ? form.exceptionalReason.trim() : "",
+      isFavourite: form.isFavourite,
+      whatIHad: form.whatIHad,
+      memory: form.memory,
+      tags: form.tags,
+      photos: await preparePhotos(form.photos),
+    }));
+  }
+
+  // --- Save to Want to go: straight from step 1, no rating, date or photos ---
+  function handleSaveWantToGo() {
+    const missing = missingOnStep(1);
+    if (missing) {
+      setError(missing);
+      return;
+    }
+
+    const place = placeFromForm();
+    if (!place || !form.type) return;
+    const type = form.type;
+    const link = form.link.trim();
+
+    save(async () => ({
+      place,
+      type,
+      status: "wantToGo",
+      tags: form.tags,
+      wantToGoNote: form.wantToGoNote.trim(),
+      links: link ? [{ url: link }] : [], // one link for now, stored as a list
+    }));
   }
 
   return (
@@ -114,14 +160,16 @@ function AddPlacePage() {
           <p className="mt-2 text-ink/70">Capture the places that make life richer.</p>
         </div>
 
-        {/* Step indicator (daisyUI steps) */}
-        <ul className="steps w-full">
-          {STEPS.map((label, index) => (
-            <li key={label} className={`step ${index + 1 <= step ? "step-primary" : ""}`}>
-              {label}
-            </li>
-          ))}
-        </ul>
+        {/* Step indicator (daisyUI steps). Want to go only has one step, so no bar. */}
+        {!isWantToGo && (
+          <ul className="steps w-full">
+            {STEPS.map((label, index) => (
+              <li key={label} className={`step ${index + 1 <= step ? "step-primary" : ""}`}>
+                {label}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* The current step */}
         <div className="card bg-soft-white p-6">
@@ -152,7 +200,16 @@ function AddPlacePage() {
             <span />
           )}
 
-          {step < 4 ? (
+          {isWantToGo ? (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleSaveWantToGo}
+              disabled={isSaving}
+            >
+              {isSaving ? "Saving..." : "Save to Want to go"}
+            </button>
+          ) : step < 4 ? (
             <button type="button" className="btn btn-primary" onClick={handleNext}>
               Next: {STEPS[step]}
             </button>

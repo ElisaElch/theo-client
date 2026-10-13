@@ -7,6 +7,7 @@ import MiniMap from "../components/map/MiniMap";
 import PhotoGallery from "../components/place/PhotoGallery";
 import type { FriendVisitResponse } from "../types/friends";
 import Avatar from "../components/Avatar";
+import WantToGoButton from "../components/place/WantToGoButton";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
 
@@ -101,12 +102,14 @@ function FriendVisitPage() {
             ))}
           </div>
         )}
+
+        <WantToGoButton friendId={friend.id} visitId={visit._id} myVisit={data.myVisit} />
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">
         {/* Left: their visit (no date: friends never see when) */}
         <section className="card flex flex-col gap-4 bg-soft-white p-6">
-                    <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <Avatar name={friend.name} url={friend.avatarUrl} size="md" />
             <h2 className="text-3xl">{firstName}'s visit</h2>
           </div>

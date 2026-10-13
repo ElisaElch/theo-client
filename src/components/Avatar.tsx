@@ -23,7 +23,7 @@ function Avatar({ name, url, size, className = "" }: AvatarProps) {
   if (url) {
     return (
       <span className="avatar">
-             <span className={`block aspect-square overflow-hidden ${box} rounded-full ${className}`}>
+        <span className={`block aspect-square overflow-hidden ${box} rounded-full ${className}`}>
           {/* alt="" because the name is always shown next to the avatar */}
           <img src={cloudinaryImage(url, px)} alt="" className="size-full object-cover" />
         </span>

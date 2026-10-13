@@ -4,6 +4,7 @@ import type {
   SearchResult,
   FriendProfileResponse,
   FriendVisitResponse,
+  MyVisitSummary,
 } from "../types/friends";
 
 // GET /api/users/search?username=...
@@ -51,4 +52,12 @@ export function getFriendVisits(userId: string) {
 // GET /api/users/:id/visits/:visitId: one of a friend's places, in full
 export function getFriendVisit(userId: string, visitId: string) {
   return apiFetch<FriendVisitResponse>(`/users/${userId}/visits/${visitId}`);
+}
+
+// POST /api/users/:id/visits/:visitId/want-to-go: save a friend's place to MY Want to go list
+export function saveFriendPlace(userId: string, visitId: string, wantToGoNote?: string) {
+  return apiFetch<{ myVisit: MyVisitSummary }>(`/users/${userId}/visits/${visitId}/want-to-go`, {
+    method: "POST",
+    body: JSON.stringify({ wantToGoNote }),
+  });
 }
