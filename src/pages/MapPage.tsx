@@ -6,6 +6,7 @@ import VisitsMap from "../components/map/VisitsMap";
 import type { FeedItem, FriendUser } from "../types/friends";
 import type { PlaceType, Visit } from "../types/visit";
 import { getVisitStats } from "../utils/visitStats";
+import { Heart } from "lucide-react";
 
 const TYPE_OPTIONS: { value: PlaceType; label: string }[] = [
   { value: "cafe", label: "Cafés" },
@@ -13,16 +14,17 @@ const TYPE_OPTIONS: { value: PlaceType; label: string }[] = [
   { value: "hotel", label: "Hotels" },
 ];
 
-// The three fixed views. Any other value of ?show= is one friend's id.
+// The fixed views, each with the colour of its pins. Any other value of ?show= is one friend's id.
 const VIEW_OPTIONS = [
-  { value: "mine", label: "My places" },
-  { value: "friends", label: "All friends" },
-  { value: "everyone", label: "Everyone" },
+  { value: "mine", label: "My places", dot: "bg-forest" },
+  { value: "friends", label: "All friends", dot: "bg-terracotta" },
+  { value: "everyone", label: "Everyone", dot: "bg-sage" }, // the colour of mixed groups
+  { value: "want-to-go", label: "Want to go", dot: "" }, // shown as a lavender heart instead
 ];
 
 const firstName = (name: string) => name.split(" ")[0];
 
-// Everywhere you (and your friends) have been, on one map
+// Everywhere you (and your friends) have been, and where you'd love to go, on one map
 function MapPage() {
   const [visits, setVisits] = useState<Visit[] | null>(null); // null = still loading
   const [friendPlaces, setFriendPlaces] = useState<FeedItem[]>([]);
@@ -46,8 +48,7 @@ function MapPage() {
 
     getMyVisits()
       .then(({ visits }) => {
-                // Only places you've been to: Want to go places aren't "yours" on the map (yet)
-        if (!ignore) setVisits(visits.filter((visit) => visit.status !== "wantToGo"));
+        if (!ignore) setVisits(visits);
       })
       .catch((err) => {
         if (!ignore) setError(err instanceof Error ? err.message : "Couldn't load your places");
@@ -81,6 +82,16 @@ function MapPage() {
     );
   }
 
+  // Your places, split: been there (forest pins) and Want to go (lavender heart pins)
+  const beenHere = useMemo(
+    () => (visits ?? []).filter((visit) => visit.status !== "wantToGo"),
+    [visits],
+  );
+  const wantToGo = useMemo(
+    () => (visits ?? []).filter((visit) => visit.status === "wantToGo"),
+    [visits],
+  );
+
   // Friends who have places, for the dropdown (each friend once, sorted by name)
   const friends = useMemo(() => {
     const byId = new Map<string, FriendUser>();
@@ -100,26 +111,30 @@ function MapPage() {
   }, [friendPlaces]);
 
   // What's on the map right now, based on the view and the ticked types
-  const { shownMine, shownFriends } = useMemo(() => {
+  const { shownMine, shownFriends, shownWantToGo } = useMemo(() => {
     const byType = <T extends { type: PlaceType }>(v: T) => shownTypes.includes(v.type);
-    const mine = (visits ?? []).filter(byType);
+    const mine = beenHere.filter(byType);
     const theirs = friendPlaces.filter(({ visit }) => byType(visit));
+    const none = { shownMine: [], shownFriends: [], shownWantToGo: [] };
 
-    if (show === "mine") return { shownMine: mine, shownFriends: [] };
-    if (show === "friends") return { shownMine: [], shownFriends: theirs };
+    if (show === "mine") return { ...none, shownMine: mine };
+    if (show === "friends") return { ...none, shownFriends: theirs };
+    if (show === "want-to-go") return { ...none, shownWantToGo: wantToGo.filter(byType) };
     if (show === "everyone") {
       // A place you've been to shows as YOUR pin (with "Also visited by..."), not twice
       const myPlaceIds = new Set(mine.map((v) => v.place._id));
       return {
+        ...none,
         shownMine: mine,
         shownFriends: theirs.filter(({ visit }) => !myPlaceIds.has(visit.place._id)),
       };
     }
     // Otherwise "show" is one friend's id
-    return { shownMine: [], shownFriends: theirs.filter(({ friend }) => friend.id === show) };
-  }, [visits, friendPlaces, shownTypes, show]);
+    return { ...none, shownFriends: theirs.filter(({ friend }) => friend.id === show) };
+  }, [beenHere, wantToGo, friendPlaces, shownTypes, show]);
 
-  const stats = useMemo(() => getVisitStats(visits ?? []), [visits]);
+  // Stats only count places you've actually been to
+  const stats = useMemo(() => getVisitStats(beenHere), [beenHere]);
 
   // The line under the heading, depending on the view
   const selectedFriend = friends.find((friend) => friend.id === show);
@@ -130,9 +145,11 @@ function MapPage() {
         ? "Everywhere your friends have been."
         : show === "everyone"
           ? "You and your friends, together."
-          : selectedFriend
-            ? `Everywhere ${firstName(selectedFriend.name)} has been.`
-            : "";
+          : show === "want-to-go"
+            ? "Everywhere you'd love to go."
+            : selectedFriend
+              ? `Everywhere ${firstName(selectedFriend.name)} has been.`
+              : "";
 
   // --- Error and loading states ---
   if (error) {
@@ -160,7 +177,7 @@ function MapPage() {
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 text-sm font-medium">Whose places</legend>
           <div className="flex flex-wrap gap-2 lg:flex-col">
-            {VIEW_OPTIONS.map(({ value, label }) => (
+                   {VIEW_OPTIONS.map(({ value, label, dot }) => (
               <button
                 key={value}
                 type="button"
@@ -168,6 +185,15 @@ function MapPage() {
                 aria-pressed={show === value}
                 className={`btn btn-sm justify-start ${show === value ? "btn-primary" : "btn-ghost"}`}
               >
+                {/* The colour key: what this view's pins look like on the map */}
+                {dot ? (
+                  <span
+                    className={`size-2.5 rounded-full ring-1 ring-soft-white ${dot}`}
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Heart className="size-3 fill-lavender text-lavender" aria-hidden="true" />
+                )}
                 {label}
               </button>
             ))}
@@ -207,7 +233,7 @@ function MapPage() {
           ))}
         </fieldset>
 
-        {/* Your own stats, like the panel in the mockup */}
+        {/* Your own stats (places you've been to) */}
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium">Your places</p>
           <div className="card grid grid-cols-3 gap-2 bg-soft-white p-4 text-center lg:grid-cols-1 lg:gap-4">
@@ -231,15 +257,30 @@ function MapPage() {
 
       {/* Right: the map */}
       <div className="flex flex-col gap-3">
-        <VisitsMap myVisits={shownMine} friendPlaces={shownFriends} alsoVisitedBy={alsoVisitedBy} />
+        <VisitsMap
+          myVisits={shownMine}
+          friendPlaces={shownFriends}
+          wantToGoVisits={shownWantToGo}
+          alsoVisitedBy={alsoVisitedBy}
+        />
 
-        {show === "mine" && visits.length === 0 && (
+        {show === "mine" && beenHere.length === 0 && (
           <p className="text-center text-ink/70">
             No places yet.{" "}
             <Link to="/places/new" className="link">
               Add your first place
             </Link>{" "}
             and it'll appear here.
+          </p>
+        )}
+
+        {show === "want-to-go" && wantToGo.length === 0 && (
+          <p className="text-center text-ink/70">
+            Nothing on your Want to go list yet. Save places from{" "}
+            <Link to="/places/new" className="link">
+              Add a place
+            </Link>{" "}
+            or from a friend's place.
           </p>
         )}
 

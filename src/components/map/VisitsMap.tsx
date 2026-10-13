@@ -10,13 +10,14 @@ import type { Visit } from "../../types/visit";
 import { cloudinaryImage } from "../../utils/cloudinaryImage";
 import Avatar from "../Avatar";
 import StarRating from "../StarRating";
-import { friendPin, theoPin } from "./theoPin";
+import { friendPin, theoPin, wantToGoPin } from "./theoPin";
 
 type LatLng = [number, number];
 
 type Props = {
   myVisits: Visit[]; // your own places (forest pins)
   friendPlaces?: FeedItem[]; // friends' places (terracotta pins)
+  wantToGoVisits?: Visit[]; // your Want to go places (lavender heart pins)
   alsoVisitedBy?: Record<string, string[]>; // place id → friends' first names, for your pins
 };
 
@@ -37,7 +38,8 @@ function FitToPoints({ points }: { points: LatLng[] }) {
 }
 
 // The round bubble shown when several pins are grouped. Its colour shows what's inside:
-// forest = only your places, terracotta = only friends' places, sage = a mix of both.
+// forest = only your places, terracotta = only friends' places,
+// lavender = only Want to go places, sage = a mix.
 // It gets a little bigger as the number grows.
 function createClusterIcon(cluster: {
   getChildCount: () => number;
@@ -46,16 +48,19 @@ function createClusterIcon(cluster: {
   const count = cluster.getChildCount();
   const size = count < 10 ? 40 : count < 100 ? 48 : 56;
 
-  // How many of the grouped pins are friends' pins?
+  // What kinds of pins are in this group?
   const markers = cluster.getAllChildMarkers();
   const friendCount = markers.filter((marker) => marker.options.icon === friendPin).length;
+  const wantToGoCount = markers.filter((marker) => marker.options.icon === wantToGoPin).length;
 
   const colours =
-    friendCount === 0
-      ? "bg-forest text-cream" // all yours
+    wantToGoCount === markers.length
+      ? "bg-lavender text-forest" // all Want to go
       : friendCount === markers.length
         ? "bg-terracotta text-soft-white" // all friends'
-        : "bg-sage text-forest"; // a mix
+        : friendCount === 0 && wantToGoCount === 0
+          ? "bg-forest text-cream" // all yours
+          : "bg-sage text-forest"; // a mix
 
   return L.divIcon({
     className: "", // removes Leaflet's default white box, like theoPin
@@ -70,7 +75,7 @@ function createClusterIcon(cluster: {
   });
 }
 
-// Shared top part of both popups: photo, name, location, stars
+// Shared top part of the popups: photo, name, location, stars
 function PopupPlace({ visit }: { visit: Visit | FeedItem["visit"] }) {
   return (
     <>
@@ -90,17 +95,18 @@ function PopupPlace({ visit }: { visit: Visit | FeedItem["visit"] }) {
   );
 }
 
-// Big map with your places and (optionally) your friends' places.
+// Big map with your places, (optionally) your friends' places and your Want to go places.
 // Pins close together are grouped into a numbered bubble; clicking a pin opens a small card.
-function VisitsMap({ myVisits, friendPlaces = [], alsoVisitedBy = {} }: Props) {
+function VisitsMap({ myVisits, friendPlaces = [], wantToGoVisits = [], alsoVisitedBy = {} }: Props) {
   // Every pin's position, for fitting the map. useMemo keeps the same list between renders,
   // so the map only re-fits when the shown places actually change.
   const points = useMemo<LatLng[]>(
     () => [
       ...myVisits.map((v): LatLng => [v.place.coordinates.lat, v.place.coordinates.lng]),
       ...friendPlaces.map(({ visit: v }): LatLng => [v.place.coordinates.lat, v.place.coordinates.lng]),
+      ...wantToGoVisits.map((v): LatLng => [v.place.coordinates.lat, v.place.coordinates.lng]),
     ],
-    [myVisits, friendPlaces],
+    [myVisits, friendPlaces, wantToGoVisits],
   );
 
   return (
@@ -160,6 +166,29 @@ function VisitsMap({ myVisits, friendPlaces = [], alsoVisitedBy = {} }: Props) {
                     className="mt-1 font-medium text-forest"
                   >
                     View their visit →
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+          {/* Your Want to go places: lavender heart pins */}
+          {wantToGoVisits.map((visit) => (
+            <Marker
+              key={`want-${visit._id}`}
+              position={[visit.place.coordinates.lat, visit.place.coordinates.lng]}
+              icon={wantToGoPin}
+            >
+              <Popup>
+                <div className="flex w-48 flex-col gap-1">
+                  <PopupPlace visit={visit} />
+                  {visit.wantToGoNote && (
+                    <span className="line-clamp-2 text-xs italic text-ink/80">
+                      "{visit.wantToGoNote}"
+                    </span>
+                  )}
+                  <Link to={`/places/${visit._id}`} className="mt-1 font-medium text-forest">
+                    View place →
                   </Link>
                 </div>
               </Popup>
