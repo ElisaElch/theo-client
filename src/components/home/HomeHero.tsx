@@ -11,9 +11,9 @@ function HomeHero() {
           Good places stay with you.
         </h1>
         <p className="max-w-md text-lg text-ink">
-            Meet Theo.
-            <br />
-        A little home for all the places you've been and loved. Keep your memories, share your favourite places with friends and find inspiration for wherever you're heading next.
+          Meet Theo.
+          <br />A little home for all the places you've been and loved. Keep your memories, share
+          your favourite places with friends and find inspiration for wherever you're heading next.
         </p>
 
         <div className="flex flex-wrap gap-3">
@@ -24,8 +24,6 @@ function HomeHero() {
             Log in
           </Link>
         </div>
-
-    
       </div>
 
       {/* Right: the photo, with a big soft curve on the top-left corner like the mockup */}
@@ -44,9 +42,7 @@ function HomeHero() {
           <br />
           Hotels
           <br />
-          
           <br />
-          
         </p>
       </div>
     </section>

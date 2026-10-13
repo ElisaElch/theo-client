@@ -267,7 +267,7 @@ function SignUpPage() {
                 onChange={(e) => setTermsAccepted(e.target.checked)}
                 required
               />
-                          <span>
+              <span>
                 I agree to the{" "}
                 <Link to="/terms" target="_blank" rel="noreferrer" className="link">
                   Terms of Service

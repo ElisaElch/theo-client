@@ -8,7 +8,7 @@ function HomeClosing() {
     <section className="flex flex-col items-center gap-8 rounded-[2rem] bg-forest px-8 py-10 text-center text-cream lg:flex-row lg:justify-between lg:px-14 lg:text-left">
       {/* Left: the mascot with a handwritten note */}
       <div className="flex items-center gap-4">
-                <img src={mascot} alt="" className="w-48 shrink-0" />
+        <img src={mascot} alt="" className="w-48 shrink-0" />
         <p className="max-w-44 -rotate-6 font-hand text-2xl leading-tight">
           Collect moments, not things <span aria-hidden="true">♡</span>
         </p>

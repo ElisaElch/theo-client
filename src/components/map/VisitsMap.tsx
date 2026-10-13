@@ -97,13 +97,21 @@ function PopupPlace({ visit }: { visit: Visit | FeedItem["visit"] }) {
 
 // Big map with your places, (optionally) your friends' places and your Want to go places.
 // Pins close together are grouped into a numbered bubble; clicking a pin opens a small card.
-function VisitsMap({ myVisits, friendPlaces = [], wantToGoVisits = [], alsoVisitedBy = {} }: Props) {
+function VisitsMap({
+  myVisits,
+  friendPlaces = [],
+  wantToGoVisits = [],
+  alsoVisitedBy = {},
+}: Props) {
   // Every pin's position, for fitting the map. useMemo keeps the same list between renders,
   // so the map only re-fits when the shown places actually change.
   const points = useMemo<LatLng[]>(
     () => [
       ...myVisits.map((v): LatLng => [v.place.coordinates.lat, v.place.coordinates.lng]),
-      ...friendPlaces.map(({ visit: v }): LatLng => [v.place.coordinates.lat, v.place.coordinates.lng]),
+      ...friendPlaces.map(({ visit: v }): LatLng => [
+        v.place.coordinates.lat,
+        v.place.coordinates.lng,
+      ]),
       ...wantToGoVisits.map((v): LatLng => [v.place.coordinates.lat, v.place.coordinates.lng]),
     ],
     [myVisits, friendPlaces, wantToGoVisits],
@@ -158,7 +166,9 @@ function VisitsMap({ myVisits, friendPlaces = [], wantToGoVisits = [], alsoVisit
                   {/* Whose place this is */}
                   <div className="mb-1 flex items-center gap-2">
                     <Avatar name={friend.name} url={friend.avatarUrl} size="sm" />
-                    <span className="text-sm font-medium text-ink">{friend.name.split(" ")[0]}</span>
+                    <span className="text-sm font-medium text-ink">
+                      {friend.name.split(" ")[0]}
+                    </span>
                   </div>
                   <PopupPlace visit={visit} />
                   <Link

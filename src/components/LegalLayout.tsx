@@ -27,8 +27,8 @@ function LegalLayout({ title, children }: Props) {
           Questions? Contact us at <span className="font-medium">hello@theo.example</span>*
         </p>
         <p className="text-ink/70 italic">
-          *Theo is a student portfolio project. All current users know the student personally,
-          or can reach them through a friend, for account deletion or in case of questions. 
+          *Theo is a student portfolio project. All current users know the student personally, or
+          can reach them through a friend, for account deletion or in case of questions.
         </p>
       </footer>
     </article>

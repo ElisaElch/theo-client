@@ -66,7 +66,7 @@ function FriendProfilePage() {
 
       {/* Who they are, and their stats */}
       <header className="flex flex-wrap items-center gap-5">
-                <Avatar name={friend.name} url={friend.avatarUrl} size="xl" />
+        <Avatar name={friend.name} url={friend.avatarUrl} size="xl" />
         <div>
           <h1 className="text-4xl sm:text-5xl">{friend.name}</h1>
           <p className="text-ink/60">@{friend.username}</p>

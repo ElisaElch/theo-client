@@ -10,7 +10,7 @@ const PHOTOS = [
   { src: photo1, focus: "object-center" },
   { src: photo2, focus: "object-center" },
   { src: photo3, focus: "object-top" }, // keep the coffee and the top of the plate
-    { src: photo4, focus: "object-[center_70%]" }, // a bit below centre, to keep the huts
+  { src: photo4, focus: "object-[center_70%]" }, // a bit below centre, to keep the huts
 ];
 
 // A row of four photos between the features and the closing band

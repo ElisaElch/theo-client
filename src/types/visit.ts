@@ -45,9 +45,9 @@ export type Visit = {
   tags: string[];
   photos: (Photo & { _id: string })[];
   sourceUrl?: string;
-    wantToGoNote: string; // why you want to go ("" if none); kept after you've been
+  wantToGoNote: string; // why you want to go ("" if none); kept after you've been
   links: Link[]; // empty list if none
-    savedFrom?: SavedFrom; // only on places saved from a friend's place
+  savedFrom?: SavedFrom; // only on places saved from a friend's place
   createdAt: string;
   updatedAt: string;
 };

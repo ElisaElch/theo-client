@@ -18,7 +18,7 @@ function FriendAvatarGrid({ friends }: Props) {
           className="group flex flex-col items-center gap-1 text-center"
         >
           {/* Photo Avatar */}
-                  <Avatar
+          <Avatar
             name={friend.user.name}
             url={friend.user.avatarUrl}
             size="lg"

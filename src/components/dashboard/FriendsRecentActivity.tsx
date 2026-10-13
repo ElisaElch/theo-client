@@ -61,7 +61,10 @@ function GroupCard({ group }: { group: ActivityGroup }) {
       ) : (
         <div className="grid aspect-[4/3] grid-cols-2 grid-rows-2 gap-1 overflow-hidden rounded-xl">
           <Tile url={covers[0]} className="row-span-2 size-full" />
-          <Tile url={covers[1]} className={`size-full ${covers.length === 2 ? "row-span-2" : ""}`} />
+          <Tile
+            url={covers[1]}
+            className={`size-full ${covers.length === 2 ? "row-span-2" : ""}`}
+          />
           {covers.length === 3 && <Tile url={covers[2]} className="size-full" />}
         </div>
       )}
@@ -87,7 +90,8 @@ function FriendsRecentActivity() {
         if (!ignore) setGroups(groups.slice(0, HOW_MANY));
       })
       .catch(() => {
-        if (!ignore) setError("Your friends' activity couldn't be loaded. Try refreshing the page.");
+        if (!ignore)
+          setError("Your friends' activity couldn't be loaded. Try refreshing the page.");
       });
 
     return () => {
@@ -98,7 +102,9 @@ function FriendsRecentActivity() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between gap-4">
-        <h2 className="font-heading text-3xl font-semibold text-forest">Friends' recent activity</h2>
+        <h2 className="font-heading text-3xl font-semibold text-forest">
+          Friends' recent activity
+        </h2>
         <Link
           to="/friends/activity"
           className="flex items-center gap-1 text-sm font-medium text-forest"

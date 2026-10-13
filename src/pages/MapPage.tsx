@@ -177,7 +177,7 @@ function MapPage() {
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 text-sm font-medium">Whose places</legend>
           <div className="flex flex-wrap gap-2 lg:flex-col">
-                   {VIEW_OPTIONS.map(({ value, label, dot }) => (
+            {VIEW_OPTIONS.map(({ value, label, dot }) => (
               <button
                 key={value}
                 type="button"
@@ -207,7 +207,9 @@ function MapPage() {
             disabled={friends.length === 0}
             aria-label="Show one friend's places"
           >
-            <option value="">{friends.length === 0 ? "No friends' places yet" : "One friend…"}</option>
+            <option value="">
+              {friends.length === 0 ? "No friends' places yet" : "One friend…"}
+            </option>
             {friends.map((friend) => (
               <option key={friend.id} value={friend.id}>
                 {friend.name}

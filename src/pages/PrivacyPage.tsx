@@ -7,8 +7,12 @@ function PrivacyPage() {
     <LegalLayout title="Privacy Policy">
       <p>
         Theo is built around your own memories, so privacy matters. This page explains, in plain
-        language, what we store, who can see it, and what you can do about it. It goes together
-        with our <Link to="/terms" className="link">Terms of Service</Link>.
+        language, what we store, who can see it, and what you can do about it. It goes together with
+        our{" "}
+        <Link to="/terms" className="link">
+          Terms of Service
+        </Link>
+        .
       </p>
 
       <h2>What we store</h2>
@@ -22,12 +26,12 @@ function PrivacyPage() {
           scrambled version (a hash) that can't be turned back into the password.
         </li>
         <li>
-          <strong>Your places:</strong> each place's name and location, plus your own visit
-          details: date, rating, what you had, your memory, tags, photos and favourites.
+          <strong>Your places:</strong> each place's name and location, plus your own visit details:
+          date, rating, what you had, your memory, tags, photos and favourites.
         </li>
         <li>
-          <strong>Your friends:</strong> who you're connected with, pending requests, and who
-          you've muted.
+          <strong>Your friends:</strong> who you're connected with, pending requests, and who you've
+          muted.
         </li>
       </ul>
 
@@ -35,12 +39,12 @@ function PrivacyPage() {
       <ul>
         <li>You can see everything in your own account.</li>
         <li>
-          Your friends can see your places, ratings, memories, tags and photos, but never the
-          dates. Theo never shows anyone else when you were somewhere.
+          Your friends can see your places, ratings, memories, tags and photos, but never the dates.
+          Theo never shows anyone else when you were somewhere.
         </li>
         <li>
-          Someone who searches for your exact username only sees your username and first name.
-          Your full name is shown to people you're friends with, or who you've sent a request to.
+          Someone who searches for your exact username only sees your username and first name. Your
+          full name is shown to people you're friends with, or who you've sent a request to.
         </li>
         <li>Theo has no public profiles, and nothing appears in search engines.</li>
       </ul>
@@ -64,8 +68,8 @@ function PrivacyPage() {
           place, and your approximate location if you use "near me".
         </li>
         <li>
-          <strong>CARTO</strong> provides the map images, and <strong>Google Fonts</strong>{" "}
-          provides the fonts. Like any website, these receive your IP address when they load.
+          <strong>CARTO</strong> provides the map images, and <strong>Google Fonts</strong> provides
+          the fonts. Like any website, these receive your IP address when they load.
         </li>
       </ul>
       <p>We never sell your data, and we don't show ads.</p>
@@ -75,8 +79,8 @@ function PrivacyPage() {
         <li>You can edit or delete any of your places and photos at any time.</li>
         <li>You can mute or remove friends at any time.</li>
         <li>
-          You can ask to see the data we hold about you, have it corrected, or have your account
-          and everything in it deleted.
+          You can ask to see the data we hold about you, have it corrected, or have your account and
+          everything in it deleted.
         </li>
       </ul>
 

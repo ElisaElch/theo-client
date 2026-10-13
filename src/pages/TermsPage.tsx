@@ -12,8 +12,8 @@ function TermsPage() {
 
       <h2>About Theo</h2>
       <p>
-        Theo is a student portfolio project. It's provided as it is, without any guarantees, and
-        it may change, have interruptions or be taken offline at any time.
+        Theo is a student portfolio project. It's provided as it is, without any guarantees, and it
+        may change, have interruptions or be taken offline at any time.
       </p>
 
       <h2>Your account</h2>
@@ -27,8 +27,12 @@ function TermsPage() {
       <ul>
         <li>Everything you add (your places, memories, ratings and photos) stays yours.</li>
         <li>
-          You give Theo permission to store it and show it to you and your friends, as described
-          in our <Link to="/privacy" className="link">Privacy Policy</Link>.
+          You give Theo permission to store it and show it to you and your friends, as described in
+          our{" "}
+          <Link to="/privacy" className="link">
+            Privacy Policy
+          </Link>
+          .
         </li>
         <li>Only upload photos you took yourself or have permission to share.</li>
       </ul>
@@ -59,9 +63,7 @@ function TermsPage() {
       </p>
 
       <h2>Changes</h2>
-      <p>
-        If these terms change, we'll update the date at the top of this page.
-      </p>
+      <p>If these terms change, we'll update the date at the top of this page.</p>
     </LegalLayout>
   );
 }

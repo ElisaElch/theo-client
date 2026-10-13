@@ -73,7 +73,7 @@ function FriendVisitPage() {
 
       <PhotoGallery photos={visit.photos} placeName={place.name} />
 
-           {/* Heading: name, location, their type, their favourite, their tags */}
+      {/* Heading: name, location, their type, their favourite, their tags */}
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-4xl sm:text-5xl">{place.name}</h1>
@@ -109,7 +109,7 @@ function FriendVisitPage() {
       <div className="grid gap-8 lg:grid-cols-[3fr_2fr]">
         {/* Left: their visit (no date: friends never see when) */}
         <section className="card flex flex-col gap-4 bg-soft-white p-6">
-                    <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <Avatar name={friend.name} url={friend.avatarUrl} size="md" />
             <h2 className="text-3xl">{firstName}'s visit</h2>
           </div>

@@ -87,7 +87,9 @@ function RecentlySaved() {
                     </div>
                   )}
                   <div>
-                    <p className="font-medium text-ink group-hover:text-forest">{visit.place.name}</p>
+                    <p className="font-medium text-ink group-hover:text-forest">
+                      {visit.place.name}
+                    </p>
                     <p className="text-sm text-ink/70">
                       {[visit.place.city, visit.place.country].filter(Boolean).join(", ")}
                     </p>

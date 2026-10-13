@@ -154,8 +154,7 @@ function PlacePage() {
 
   const { place } = visit;
   const isWantToGo = visit.status === "wantToGo";
-  const hasWhy =
-    Boolean(visit.wantToGoNote) || visit.links.length > 0 || Boolean(visit.savedFrom);
+  const hasWhy = Boolean(visit.wantToGoNote) || visit.links.length > 0 || Boolean(visit.savedFrom);
 
   return (
     <div className="flex flex-col gap-8">
@@ -277,7 +276,9 @@ function PlacePage() {
             {visit.rating && <StarRating rating={visit.rating} />}
 
             {visit.rating === 11 && visit.exceptionalReason && (
-              <p className="italic text-terracotta">Exceptional because: {visit.exceptionalReason}</p>
+              <p className="italic text-terracotta">
+                Exceptional because: {visit.exceptionalReason}
+              </p>
             )}
 
             {visit.whatIHad && (

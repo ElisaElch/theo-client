@@ -176,7 +176,9 @@ function EditPlacePage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <header>
-        <h1>{isMarkingVisited ? `You've been to ${visit.place.name}!` : `Edit ${visit.place.name}`}</h1>
+        <h1>
+          {isMarkingVisited ? `You've been to ${visit.place.name}!` : `Edit ${visit.place.name}`}
+        </h1>
         <p className="mt-2 text-ink/70">
           {isMarkingVisited ? "Add your visit and memories." : placeLocation}
         </p>

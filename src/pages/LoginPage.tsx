@@ -38,7 +38,7 @@ function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <div className="card w-full max-w-md bg-soft-white p-8">
-            <Link to="/" className="inline-block">
+        <Link to="/" className="inline-block">
           <img src={logo} alt="theo home" className="h-14 w-auto" />
         </Link>
 
@@ -58,7 +58,7 @@ function LoginPage() {
             />
           </label>
 
-                <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1">
             <label htmlFor="login-password" className="text-sm font-medium">
               Password
             </label>
