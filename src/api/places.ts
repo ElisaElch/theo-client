@@ -27,5 +27,6 @@ export async function searchTheoPlaces(query: string): Promise<LocationResult[]>
     coordinates: place.coordinates,
     suggestedType: place.type,
     label: [place.city, place.country].filter(Boolean).join(", "), // e.g. "Melbourne, Australia"
+    fromTheo: true,
   }));
 }

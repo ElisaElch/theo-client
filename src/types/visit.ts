@@ -7,6 +7,11 @@ export type Photo = {
   publicId: string;
 };
 
+// A link about a place, e.g. an Instagram reel or Google Maps (http/https only)
+export type Link = {
+  url: string;
+};
+
 export type Place = {
   _id: string;
   externalId: string;
@@ -32,6 +37,8 @@ export type Visit = {
   tags: string[];
   photos: (Photo & { _id: string })[];
   sourceUrl?: string;
+    wantToGoNote: string; // why you want to go ("" if none); kept after you've been
+  links: Link[]; // empty list if none
   createdAt: string;
   updatedAt: string;
 };

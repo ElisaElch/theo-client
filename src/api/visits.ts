@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { Photo, Place, Visit, PlaceType } from "../types/visit";
+import type { Photo, Place, Visit, PlaceType, Link } from "../types/visit";
 import type { FriendWhoVisited } from "../types/friends";
 
 // What the frontend sends when saving a place:
@@ -16,6 +16,8 @@ export type CreateVisitData = {
   memory?: string;
   tags?: string[];
   photos?: Photo[];
+  wantToGoNote?: string; // "want to go" only: why you want to go
+  links?: Link[]; // e.g. an Instagram reel or Google Maps link
 };
 
 // Editing: any visit field, but never the place

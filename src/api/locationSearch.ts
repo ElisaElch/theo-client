@@ -22,6 +22,7 @@ export type LocationResult = {
   coordinates: { lat: number; lng: number };
   suggestedType?: PlaceType; // e.g. OpenStreetMap knows a place is a café
   label: string; // full address, shown in the results list
+   fromTheo?: boolean; // true = already saved on Theo (shared name, can't be changed)
 };
 
 // OpenStreetMap place types → Theo's three types

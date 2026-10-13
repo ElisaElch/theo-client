@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { Search } from "lucide-react";
 import { getMyVisits } from "../api/visits";
 import MyPlacesFilters from "../components/myPlaces/MyPlacesFilters";
@@ -8,11 +8,15 @@ import type { Visit } from "../types/visit";
 import { defaultFilters, filterVisits, type VisitFilters } from "../utils/filterVisits";
 import { getVisitStats } from "../utils/visitStats";
 
-// "Where have I been?": all your saved places, with search and filters
+// "Where have I been?" and "Where do I want to go?": your saved places in two tabs.
+// The tab is in the URL (?tab=want-to-go) so other pages can link straight to it.
 function MyPlacesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [visits, setVisits] = useState<Visit[] | null>(null); // null = still loading
   const [error, setError] = useState("");
   const [filters, setFilters] = useState<VisitFilters>(defaultFilters);
+
+  const isWantToGoTab = searchParams.get("tab") === "want-to-go";
 
   // Load your visits once when the page opens
   useEffect(() => {
@@ -35,9 +39,35 @@ function MyPlacesPage() {
     setFilters((current) => ({ ...current, ...changes }));
   }
 
-  // Only re-filter when the visits or the filters change, not on every render
-  const shownVisits = useMemo(() => filterVisits(visits ?? [], filters), [visits, filters]);
-  const stats = useMemo(() => getVisitStats(visits ?? []), [visits]);
+  // Switch tabs by changing the URL; filters start fresh on each tab
+  function showTab(wantToGo: boolean) {
+    setSearchParams(wantToGo ? { tab: "want-to-go" } : {});
+    setFilters(defaultFilters);
+  }
+
+  // Split your places into the two lists
+  const beenHere = useMemo(
+    () => (visits ?? []).filter((visit) => visit.status !== "wantToGo"),
+    [visits],
+  );
+  const wantToGo = useMemo(
+    () => (visits ?? []).filter((visit) => visit.status === "wantToGo"),
+    [visits],
+  );
+
+  const currentList = isWantToGoTab ? wantToGo : beenHere;
+
+  // Want to go only uses the search box: date and rating don't apply there
+  const shownVisits = useMemo(
+    () =>
+      isWantToGoTab
+        ? filterVisits(wantToGo, { ...defaultFilters, search: filters.search })
+        : filterVisits(beenHere, filters),
+    [isWantToGoTab, wantToGo, beenHere, filters],
+  );
+
+  // Stats only count places you've actually been to
+  const stats = useMemo(() => getVisitStats(beenHere), [beenHere]);
 
   // --- Error and loading states ---
   if (error) {
@@ -52,7 +82,7 @@ function MyPlacesPage() {
     );
   }
 
-  // --- Nothing saved yet ---
+  // --- Nothing saved at all yet ---
   if (visits.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
@@ -76,62 +106,108 @@ function MyPlacesPage() {
   );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-      {/* Filters: sidebar on desktop */}
-      <aside className="hidden lg:block">{filters_panel}</aside>
+    <div className={`grid gap-8 ${isWantToGoTab ? "" : "lg:grid-cols-[220px_1fr]"}`}>
+      {/* Filters: sidebar on desktop (Been here only) */}
+      {!isWantToGoTab && <aside className="hidden lg:block">{filters_panel}</aside>}
 
       <div className="flex flex-col gap-6">
-        {/* Heading and stats */}
-        <header>
-          <h1 className="text-5xl">My places</h1>
-          <p className="mt-2 text-lg text-ink/70">Everywhere worth remembering.</p>
-          <p className="mt-4 font-medium">
-            {stats.places} {stats.places === 1 ? "place" : "places"} · {stats.cities}{" "}
-            {stats.cities === 1 ? "city" : "cities"} · {stats.countries}{" "}
-            {stats.countries === 1 ? "country" : "countries"}
-          </p>
-        </header>
-
-        {/* Search */}
-        <label className="input w-full">
-          <Search className="h-4 w-4 text-ink/50" />
-          <input
-            type="search"
-            placeholder="Search by name, city or tag"
-            value={filters.search}
-            onChange={(e) => updateFilters({ search: e.target.value })}
-          />
-        </label>
-
-        {/* Filters: collapsible on phones and tablets */}
-        <details className="collapse collapse-arrow bg-soft-white lg:hidden">
-          <summary className="collapse-title font-medium">Filters</summary>
-          <div className="collapse-content">{filters_panel}</div>
-        </details>
-
-        {/* Results */}
-        {shownVisits.length > 0 ? (
-          <>
-            <p className="text-sm text-ink/70">
-              Showing {shownVisits.length} of {visits.length}
+        {/* Heading, tabs and stats */}
+        <header className="flex flex-col gap-4">
+          <div>
+            <h1 className="text-5xl">My places</h1>
+            <p className="mt-2 text-lg text-ink/70">
+              {isWantToGoTab ? "Places you'd love to try." : "Everywhere worth remembering."}
             </p>
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {shownVisits.map((visit) => (
-                <VisitCard key={visit._id} visit={visit} to={`/places/${visit._id}`} />
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <p className="text-ink/70">No places match your search or filters.</p>
+          </div>
+
+          <div role="tablist" className="tabs tabs-border">
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setFilters(defaultFilters)}
+              role="tab"
+              aria-selected={!isWantToGoTab}
+              className={`tab ${!isWantToGoTab ? "tab-active" : ""}`}
+              onClick={() => showTab(false)}
             >
-              Clear filters
+              Been here ({beenHere.length})
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={isWantToGoTab}
+              className={`tab ${isWantToGoTab ? "tab-active" : ""}`}
+              onClick={() => showTab(true)}
+            >
+              Want to go ({wantToGo.length})
             </button>
           </div>
+
+          {!isWantToGoTab && beenHere.length > 0 && (
+            <p className="font-medium">
+              {stats.places} {stats.places === 1 ? "place" : "places"} · {stats.cities}{" "}
+              {stats.cities === 1 ? "city" : "cities"} · {stats.countries}{" "}
+              {stats.countries === 1 ? "country" : "countries"}
+            </p>
+          )}
+        </header>
+
+        {currentList.length === 0 ? (
+          /* This tab is empty */
+          <div className="flex flex-col items-center gap-4 py-12 text-center">
+            <p className="max-w-md text-ink/70">
+              {isWantToGoTab
+                ? "Nothing on your Want to go list yet. Save places you'd love to try, from Add a place or from a friend's place."
+                : "You haven't marked any places as visited yet."}
+            </p>
+            <Link to="/places/new" className="btn btn-primary">
+              + Add a place
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Search */}
+            <label className="input w-full">
+              <Search className="h-4 w-4 text-ink/50" />
+              <input
+                type="search"
+                placeholder="Search by name, city or tag"
+                value={filters.search}
+                onChange={(e) => updateFilters({ search: e.target.value })}
+              />
+            </label>
+
+            {/* Filters: collapsible on phones and tablets (Been here only) */}
+            {!isWantToGoTab && (
+              <details className="collapse collapse-arrow bg-soft-white lg:hidden">
+                <summary className="collapse-title font-medium">Filters</summary>
+                <div className="collapse-content">{filters_panel}</div>
+              </details>
+            )}
+
+            {/* Results */}
+            {shownVisits.length > 0 ? (
+              <>
+                <p className="text-sm text-ink/70">
+                  Showing {shownVisits.length} of {currentList.length}
+                </p>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {shownVisits.map((visit) => (
+                    <VisitCard key={visit._id} visit={visit} to={`/places/${visit._id}`} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-3 py-12 text-center">
+                <p className="text-ink/70">No places match your search or filters.</p>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setFilters(defaultFilters)}
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

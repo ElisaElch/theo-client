@@ -12,6 +12,9 @@ export type PhotoDraft = {
 // Everything the Add a Place form collects across its four steps
 export type AddPlaceForm = {
   // Step 1: Details
+  status: "visited" | "wantToGo"; // "I've been here" or "I want to go"
+  wantToGoNote: string; // "want to go" only: why you want to go
+  link: string; // optional link (Instagram, Google Maps...); "" = none
   type: PlaceType | ""; // "" = not chosen yet
   location: LocationResult | null; // chosen search result
   name: string; // starts as the search result's name, can be edited
@@ -28,6 +31,9 @@ export type AddPlaceForm = {
 };
 
 export const emptyForm: AddPlaceForm = {
+  status: "visited", // most people add places they've been to
+  wantToGoNote: "",
+  link: "",
   type: "",
   location: null,
   name: "",
