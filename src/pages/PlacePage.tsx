@@ -11,12 +11,13 @@ import {
   Trash2,
 } from "lucide-react";
 import { deleteVisit, getVisit } from "../api/visits";
+import Avatar from "../components/Avatar";
 import ConfirmDialog from "../components/ConfirmDialog";
 import StarRating from "../components/StarRating";
 import MiniMap from "../components/map/MiniMap";
 import FriendsWhoVisited from "../components/place/FriendsWhoVisited";
 import PhotoGallery from "../components/place/PhotoGallery";
-import type { Link as VisitLink, Visit } from "../types/visit";
+import type { Link as VisitLink, SavedFrom, Visit } from "../types/visit";
 import { formatDate } from "../utils/formatDate";
 
 const TYPE_LABELS = { cafe: "Café", restaurant: "Restaurant", hotel: "Hotel" };
@@ -36,10 +37,29 @@ function linkLabel(url: string): string {
   }
 }
 
-// The note and links saved while the place was on the Want to go list
-function WhyIWantToGo({ note, links }: { note: string; links: VisitLink[] }) {
+// The note, links and recommender saved while the place was on the Want to go list
+function WhyIWantToGo({
+  note,
+  links,
+  savedFrom,
+}: {
+  note: string;
+  links: VisitLink[];
+  savedFrom?: SavedFrom;
+}) {
   return (
     <>
+      {/* Whose recommendation it was (saved from their place) */}
+      {savedFrom && (
+        <Link
+          to={`/friends/${savedFrom._id}`}
+          className="flex items-center gap-2 self-start text-sm text-ink/70 hover:text-forest"
+        >
+          <Avatar name={savedFrom.firstName} url={savedFrom.avatar?.url} size="sm" />
+          Recommended by <span className="font-medium text-ink">{savedFrom.firstName}</span>
+        </Link>
+      )}
+
       {note && <p className="whitespace-pre-line italic">"{note}"</p>}
 
       {links.length > 0 && (
@@ -134,13 +154,17 @@ function PlacePage() {
 
   const { place } = visit;
   const isWantToGo = visit.status === "wantToGo";
-  const hasWhy = Boolean(visit.wantToGoNote) || visit.links.length > 0;
+  const hasWhy =
+    Boolean(visit.wantToGoNote) || visit.links.length > 0 || Boolean(visit.savedFrom);
 
   return (
     <div className="flex flex-col gap-8">
       {/* Top bar: back link on the left, edit and delete on the right */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link to="/my-places" className="flex items-center gap-1 text-sm hover:text-forest">
+        <Link
+          to={isWantToGo ? "/my-places?tab=want-to-go" : "/my-places"}
+          className="flex items-center gap-1 text-sm hover:text-forest"
+        >
           <ArrowLeft className="h-4 w-4" />
           Back to My Places
         </Link>
@@ -216,14 +240,23 @@ function PlacePage() {
             <h2 className="text-3xl">Why you want to go</h2>
 
             {hasWhy ? (
-              <WhyIWantToGo note={visit.wantToGoNote} links={visit.links} />
+              <WhyIWantToGo
+                note={visit.wantToGoNote}
+                links={visit.links}
+                savedFrom={visit.savedFrom}
+              />
             ) : (
               <p className="text-ink/70">No note yet. You can add one with Edit.</p>
             )}
 
             <div className="mt-2 flex flex-col gap-2 border-t border-base-300 pt-4">
               <p className="text-sm text-ink/70">Been here now? Add your visit and memories.</p>
-              <Link to={`/places/${visit._id}/edit?visited=1`} className="btn self-start border-none bg-sage/40 text-forest hover:bg-sage/60">
+              <Link
+                to={`/places/${visit._id}/edit?visited=1`}
+                // The "I've been here" button colour (light green). For peach instead:
+                // "btn self-start border-none bg-peach text-forest hover:bg-peach/80"
+                className="btn self-start border-none bg-sage/40 text-forest hover:bg-sage/60"
+              >
                 <Check className="h-4 w-4" />
                 I've been here
               </Link>
@@ -265,7 +298,11 @@ function PlacePage() {
             {hasWhy && (
               <div className="flex flex-col gap-2">
                 <h3 className="text-sm font-medium">Why you wanted to go</h3>
-                <WhyIWantToGo note={visit.wantToGoNote} links={visit.links} />
+                <WhyIWantToGo
+                  note={visit.wantToGoNote}
+                  links={visit.links}
+                  savedFrom={visit.savedFrom}
+                />
               </div>
             )}
           </section>
